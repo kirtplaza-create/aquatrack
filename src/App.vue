@@ -1,11 +1,9 @@
 <template>
-  <div class="min-h-screen">
-    <div class="flex">
-      <!-- Sidebar only shows if not on login page -->
-      <Sidebar v-if="$route.path !== '/'" />
-      <div class="flex-1 p-0">
-        <router-view />
-      </div>
+  <div class="flex min-h-screen bg-white">
+    <!-- Sidebar only shows if not on login page -->
+    <Sidebar v-if="$route.path !== '/'" />
+    <div class="flex-1 p-0">
+      <router-view />
     </div>
   </div>
 </template>

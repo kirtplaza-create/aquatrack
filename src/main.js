@@ -5,13 +5,15 @@ import App from './App.vue'
 import './index.css'
 
 import LoginPage from './pages/LoginPage.vue'
-import ForgotPassword from './pages/ForgotPassword.vue'
 import Dashboard from './pages/Dashboard.vue'
 
 const routes = [
   { path: '/', component: LoginPage },
-  { path: '/forgot', component: ForgotPassword },
   { path: '/dashboard', component: Dashboard },
+  {path: '/sales', component: () => import('./pages/SalesRecord.vue') },
+  {path: '/account', component: () => import('./pages/Account.vue') },
+  {path: '/settings', component: () => import('./pages/Settings.vue') },
+  {path: '/logout', component: () => import('./pages/Logout.vue') }
 ]
 
 const router = createRouter({
