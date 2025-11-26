@@ -29,7 +29,7 @@
           <div>
             <div class="rounded-xl bg-orange-100 p-3 inline-block mb-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <rcle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="10" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3" />
               </svg>
             </div>
@@ -132,7 +132,7 @@
           </div>
           <div class="rounded-xl bg-blue-50 p-5 flex flex-col">
             <div class="flex justify-between items-center mb-2">
-              <span class="text-blue-500 text-2xl">B</span>
+              <span class="text-blue-500 text-2xl">👜</span>
             </div>
             <span class="font-semibold text-slate-500">Total Gallons Sold</span>
             <span class="font-bold text-xl text-slate-900 mt-1">{{ totalGallonsSold }} <span class="text-xs">gallons</span></span>
@@ -207,7 +207,7 @@
             />
             <span class="absolute left-4 top-3.5 text-blue-400">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <rcle cx="11" cy="11" r="8" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"/>
+                <circle cx="11" cy="11" r="8" stroke-width="2"/><line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2"/>
               </svg>
             </span>
           </div>
@@ -290,14 +290,14 @@
                   title="Mark as Done"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <rcle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="10" />
                     <path d="M12 8v4l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                   Collectables
                 </button>
                 <span v-else class="flex items-center gap-2 text-green-600">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <rcle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="10" />
                     <path d="M16 12l-4 4-4-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                   </svg>
                   Done
