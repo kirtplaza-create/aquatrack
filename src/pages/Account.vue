@@ -12,8 +12,8 @@
                 <path d="M4 20c0-3 4-5 8-5s8 2 8 5" stroke="currentColor" stroke-width="2" fill="none"/>
               </svg>
             </div>
-            <div class="text-white text-2xl font-bold mt-1 mb-[-3px]">Olivia Wilson</div>
-            <div class="text-white/80 text-base mb-4">Business Owner</div>
+            <div class="text-white text-2xl font-bold mt-1 mb-[-3px]"></div>
+            <div class="text-white/80 text-base mb-4"></div>
             <div class="flex flex-col gap-3 mt-1 w-full text-white text-sm">
               <!-- Phone Row (SVG fixed) -->
               <div class="flex items-center gap-2">
@@ -22,7 +22,7 @@
                     d="M22 16.92V21a2 2 0 01-2.18 2A19.86 19.86 0 013 5.18 2 2 0 015 3h4.09a2 2 0 012 1.72c.13 1.14.4 2.25.77 3.32a2 2 0 01-.45 2.11L9.91 10.91a16 16 0 006.12 6.13l1.77-1.77a2 2 0 012.11-.45c1.07.37 2.18.64 3.32.77A2 2 0 0121 16.92z"/>
                 </svg>
                 <span>Phone</span>
-                <span class="ml-auto font-semibold text-[#bfe8ff]">+123-456-7890</span>
+                <span class="ml-auto font-semibold text-[#bfe8ff]"></span>
               </div>
               <!-- Email Row -->
               <div class="flex items-center gap-2">
@@ -31,7 +31,7 @@
                   <path stroke-width="2" d="M4 8h16"/>
                 </svg>
                 <span>Email</span>
-                <span class="ml-auto font-semibold text-[#bfe8ff] truncate">oliviawilson@gmail.com</span>
+                <span class="ml-auto font-semibold text-[#bfe8ff] truncate"></span>
               </div>
               <!-- Address Row -->
               <div class="flex items-center gap-2">
@@ -40,7 +40,7 @@
                   <rect x="2" y="10" width="20" height="10" rx="2" stroke-width="2"/>
                 </svg>
                 <span>Address</span>
-                <span class="ml-auto font-semibold text-[#bfe8ff] w-36 text-right">123 Anywhere St., Any City, ST 12345</span>
+                <span class="ml-auto font-semibold text-[#bfe8ff] w-36 text-right"></span>
               </div>
             </div>
           </div>
@@ -105,12 +105,12 @@
 import { ref } from 'vue'
 
 const form = ref({
-  name: 'Olivia Wilson',
-  phone: '123-456-7890',
-  email: 'oliviawilson@gmail.com',
-  address: '123 Anywhere St., A',
-  password: 'password',
-  confirmPassword: 'password'
+  name: '',
+  phone: '',
+  email: '',
+  address: '',
+  password: '',
+  confirmPassword: ''
 })
 
 const popup = ref({ text: '' })

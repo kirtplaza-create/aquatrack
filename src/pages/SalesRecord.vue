@@ -4,6 +4,7 @@
       <div class="rounded-2xl bg-white shadow-lg p-10">
         <h2 class="text-3xl font-semibold text-[#183153] mb-8">Sales Records</h2>
         <div class="flex items-center gap-3 mb-6">
+          <!-- ... sort/filter inputs unchanged ... -->
           <div class="flex items-center gap-1">
             <span class="text-gray-600">Sort by</span>
             <select class="rounded-lg border px-3 py-1 focus:ring-2 focus:ring-blue-400 outline-none">
@@ -72,20 +73,26 @@
             <tbody>
               <tr
                 v-for="record in filteredRecords"
-                :key="record.id"
+                :key="record.customer + record.amount + record.date + record.time"
                 class="transition duration-150 hover:bg-blue-50 hover:scale-[1.01] cursor-pointer"
               >
                 <td class="py-5 px-6">
                   <div class="font-semibold text-base">{{ record.customer }}</div>
                   <div class="text-xs text-gray-400 mt-1">
-                    {{ record.purpose === 'Delivery' ? 'To deliver' : 'Refill schedule for' }}
+                    <!-- Show helper text following dashboard logic: -->
+                    {{ record.type === 'Delivery'
+                        ? 'Delivery schedule'
+                        : (record.type === 'Walk-in'
+                            ? 'Walk-in refill'
+                            : 'Refill schedule for') }}
                   </div>
                 </td>
                 <td class="py-5 px-6">
                   {{ record.date }} <br />
                   <span class="text-gray-400 text-xs">{{ record.time }}</span>
                 </td>
-                <td class="py-5 px-6">{{ record.purpose }}</td>
+                <!-- Purpose should use "type" from transactions for consistency -->
+                <td class="py-5 px-6">{{ record.type }}</td>
                 <td class="py-5 px-6">{{ record.gallons }}</td>
                 <td class="py-5 px-6 font-semibold">₱{{ record.amount }}</td>
               </tr>
@@ -104,6 +111,9 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useSalesStore } from '../stores/useSalesStore'
+
+const salesStore = useSalesStore()
 
 const searchVal = ref('')
 const filterStatus = ref('All')
@@ -116,9 +126,7 @@ function selectStatus(status) {
   dropdownOpen.value = false
 }
 
-// Click outside logic for Figma-style dropdown
 function handleDropdownClick(event) {
-  // Only close if click outside menu and button
   if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
     dropdownOpen.value = false
   }
@@ -126,25 +134,24 @@ function handleDropdownClick(event) {
 onMounted(() => window.addEventListener('click', handleDropdownClick))
 onBeforeUnmount(() => window.removeEventListener('click', handleDropdownClick))
 
-const records = ref([
-  { id: 1, customer: 'Alec Tenorio', date: '2025-10-20', time: '2m ago', purpose: 'Walk-in', gallons: 5, amount: 100, status: 'Pending' },
-  { id: 2, customer: 'Kirt Plaza', date: '2025-10-20', time: '10m ago', purpose: 'Walk-in', gallons: 5, amount: 100, status: 'Pending' },
-  { id: 3, customer: 'Rammel Haga', date: '2025-10-20', time: '1h ago', purpose: 'Delivery', gallons: 10, amount: 200, status: 'Completed' },
-  { id: 4, customer: 'Princess Estialbo', date: '2025-10-20', time: '2h ago', purpose: 'Delivery', gallons: 6, amount: 120, status: 'Completed' },
-  { id: 5, customer: 'Leizl Juntilla', date: '2025-10-20', time: '08:00 AM', purpose: 'Delivery', gallons: 7, amount: 140, status: 'Completed' }
-])
+const records = computed(() => salesStore.transactions)
 
 const filteredRecords = computed(() => {
   let data = records.value
   if (filterStatus.value !== 'All') {
-    data = data.filter(r => r.status === filterStatus.value)
+    if (filterStatus.value === 'Completed') {
+      data = data.filter(r => r.status === 'Done')
+    }
+    if (filterStatus.value === 'Pending') {
+      data = data.filter(r => r.status === 'Collectables')
+    }
   }
   if (searchVal.value.trim()) {
     const lower = searchVal.value.toLowerCase()
     data = data.filter(r =>
       r.customer.toLowerCase().includes(lower) ||
       r.date.includes(lower) ||
-      r.purpose.toLowerCase().includes(lower)
+      (r.type?.toLowerCase().includes(lower) || r.purpose?.toLowerCase().includes(lower))
     )
   }
   return data
