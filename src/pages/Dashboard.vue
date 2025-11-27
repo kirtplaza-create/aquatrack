@@ -59,62 +59,105 @@
     </div>
 
     <!-- Add Sales Modal -->
-    <div v-if="showAddSale" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div class="bg-gradient-to-r from-[#246af3] via-[#357Cf5] to-[#3588ff] rounded-2xl p-8 w-[500px] relative shadow-lg animate-fadeIn">
-        <button
-          class="absolute top-4 right-4 text-white hover:text-gray-200 text-2xl font-bold transition hover:scale-125"
-          @click="closeAddSale"
-        >×</button>
-        <h2 class="text-2xl font-bold text-white mb-6">Add Sales</h2>
-        <form @submit.prevent="saveSale">
-          <div class="mb-4">
-            <label class="block text-white mb-1">Customer Name:</label>
-            <input v-model="sale.customer" type="text" class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"/>
-          </div>
-          <div class="mb-4">
-            <label class="block text-white mb-1">Purpose:</label>
-            <select v-model="sale.purpose" class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-              <option value="">Select</option>
-              <option value="Walk-in">Walk-in</option>
-              <option value="Delivery">Delivery</option>
-            </select>
-          </div>
-          <div class="mb-4">
-            <label class="block text-white mb-1">No. Gallons:</label>
-            <input v-model.number="sale.gallons" type="number" min="1" class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"/>
-          </div>
-          <div class="mb-4 flex gap-2">
-            <div class="flex-1">
-              <label class="block text-white mb-1">Price per Gallon:</label>
-              <input v-model.number="sale.price" type="number" min="1" class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"/>
-              <span class="text-xs text-white">Auto Fills</span>
-            </div>
-            <div class="flex-1">
-              <label class="block text-white mb-1">Total Amount:</label>
-              <input :value="totalAmount" type="text" class="w-full px-3 py-2 rounded-xl border border-gray-200 transition" readonly />
-              <span class="text-xs text-white">Auto Calculates</span>
-            </div>
-          </div>
-          <div class="mb-6">
-            <label class="block text-white mb-1">Payment Status:</label>
-            <select v-model="sale.status" class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
-              <option value="">Select</option>
-              <option value="Pending">Collectables</option>
-              <option value="Paid">Paid</option>
-            </select>
-          </div>
-          <div class="flex gap-4">
-            <button
-              type="submit"
-              class="flex-1 bg-black text-white py-3 rounded-xl font-semibold transition hover:bg-gray-800 hover:scale-105"
-              :disabled="!isSaleFormValid"
-              :class="{ 'opacity-50 cursor-not-allowed': !isSaleFormValid }"
-            >Save Sale</button>
-            <button type="button" class="flex-1 bg-white text-blue-600 py-3 rounded-xl font-semibold transition hover:bg-blue-100 hover:scale-105" @click="closeAddSale">Cancel</button>
-          </div>
-        </form>
+    <!-- Add Sales Modal -->
+<div v-if="showAddSale" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+  <div class="bg-gradient-to-r from-[#246af3] via-[#357Cf5] to-[#3588ff] rounded-2xl p-8 w-[500px] relative shadow-lg animate-fadeIn">
+    <button
+      class="absolute top-4 right-4 text-white hover:text-gray-200 text-2xl font-bold transition hover:scale-125"
+      @click="closeAddSale"
+    >×</button>
+    <h2 class="text-2xl font-bold text-white mb-6">Add Sales</h2>
+
+    <form @submit.prevent="saveSale">
+      <!-- Customer Name -->
+      <div class="mb-4">
+        <label class="block text-white mb-1">Customer Name:</label>
+        <input
+          v-model="sale.name"
+          type="text"
+          class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+        />
       </div>
-    </div>
+
+      <!-- Purpose -->
+      <div class="mb-4">
+        <label class="block text-white mb-1">Purpose:</label>
+        <select
+          v-model="sale.purpose"
+          class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+        >
+          <option value="">Select</option>
+          <option value="Walk-in">Walk-in</option>
+          <option value="Delivery">Delivery</option>
+        </select>
+      </div>
+
+      <!-- Gallons -->
+      <div class="mb-4">
+        <label class="block text-white mb-1">No. Gallons:</label>
+        <input
+          v-model.number="sale.gallons"
+          type="number"
+          min="1"
+          class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+        />
+      </div>
+
+      <!-- Price + Total -->
+      <div class="mb-4 flex gap-2">
+        <div class="flex-1">
+          <label class="block text-white mb-1">Price per Gallon:</label>
+          <input
+            v-model.number="sale.price_per_gallon"
+            type="number"
+            min="1"
+            class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+          />
+          <span class="text-xs text-white">Auto Fills</span>
+        </div>
+        <div class="flex-1">
+          <label class="block text-white mb-1">Total Amount:</label>
+          <input
+            :value="totalAmount"
+            type="text"
+            class="w-full px-3 py-2 rounded-xl border border-gray-200 transition"
+            readonly
+          />
+          <span class="text-xs text-white">Auto Calculates</span>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="mb-6">
+        <label class="block text-white mb-1">Payment Status:</label>
+        <select
+          v-model="sale.status"
+          class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+        >
+          <option value="">Select</option>
+          <option value="Collectables">Collectables</option>
+          <option value="Done">Done</option>
+        </select>
+      </div>
+
+      <!-- Buttons -->
+      <div class="flex gap-4">
+        <button
+          type="submit"
+          class="flex-1 bg-black text-white py-3 rounded-xl font-semibold transition hover:bg-gray-800 hover:scale-105"
+          :disabled="!isSaleFormValid"
+          :class="{ 'opacity-50 cursor-not-allowed': !isSaleFormValid }"
+        >Save Sale</button>
+
+        <button
+          type="button"
+          class="flex-1 bg-white text-blue-600 py-3 rounded-xl font-semibold transition hover:bg-blue-100 hover:scale-105"
+          @click="closeAddSale"
+        >Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>  
 
     <!-- Main Grids -->
     <div class="grid grid-cols-2 gap-6">
@@ -212,7 +255,7 @@
             </span>
           </div>
         </div>
-        <div class="flex gap-2">
+        <div class="flex gap-2">      
           <button
             :class="[
               'rounded-xl px-6 py-2 font-semibold shadow transition',
@@ -248,63 +291,79 @@
               <th class="px-4 py-3 font-semibold text-left">Status</th>
             </tr>
           </thead>
-          <tbody>
-            <tr
-              v-for="tx in filteredTransactions"
-              :key="tx.customer + tx.amount"
-              class="border-b transition duration-200 hover:bg-blue-50 hover:scale-[1.01]"
-            >
-              <td class="px-4 py-3 flex items-center gap-3">
-                <span class="rounded-full bg-blue-500 text-white w-9 h-9 flex items-center justify-center font-semibold shadow">
-                  {{ tx.customer.charAt(0) }}
-                </span>
-                {{ tx.customer }}
-              </td>
-              <td class="px-4 py-3">
-                <span
-                  :class="[
-                    'px-3 py-1 rounded-lg font-semibold',
-                    tx.type === 'Walk-in' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
-                  ]"
-                >{{ tx.type }}</span>
-              </td>
-              <td class="px-4 py-3">
-                {{ tx.date }}
-                <span class="text-gray-400 text-xs block">{{ tx.time }}</span>
-              </td>
-              <td class="px-4 py-3 flex items-center gap-2">
-                <span class="text-blue-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M8 20v-5m8 5v-5m3-9a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2h9a2 2 0 002-2V6z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                </span>
-                {{ tx.gallons }} gal
-              </td>
-              <td class="px-4 py-3 font-bold">₱{{ tx.amount }}</td>
-              <td class="px-4 py-3">
-                <button
-                  v-if="tx.status === 'Collectables'"
-                  @click="confirmAndMarkDone(tx)"
-                  class="flex items-center gap-2 text-orange-500 hover:text-green-600 transition"
-                  style="background: transparent; border: none; padding: 0; cursor: pointer;"
-                  title="Mark as Done"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 8v4l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  Collectables
-                </button>
-                <span v-else class="flex items-center gap-2 text-green-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M16 12l-4 4-4-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                  </svg>
-                  Done
-                </span>
-              </td>
-            </tr>
-          </tbody>
+         <tbody>
+  <tr
+    v-for="tx in filteredTransactions"
+    :key="tx.id"
+    class="border-b transition duration-200 hover:bg-blue-50 hover:scale-[1.01]"
+  >
+    <!-- Customer -->
+    <td class="px-4 py-3 flex items-center gap-3">
+      <span class="rounded-full bg-blue-500 text-white w-9 h-9 flex items-center justify-center font-semibold shadow">
+        {{ (tx.name || '?').charAt(0) }}
+      </span>
+      {{ tx.name }}
+    </td>
+
+    <!-- Type (purpose) -->
+    <td class="px-4 py-3">
+      <span
+        :class="[
+          'px-3 py-1 rounded-lg font-semibold',
+          tx.purpose === 'Walk-in' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'
+        ]"
+      >
+        {{ tx.purpose }}
+      </span>
+    </td>
+
+    <!-- Date & Time from created_at -->
+    <td class="px-4 py-3">
+      {{ tx.created_at ? tx.created_at.slice(0, 10) : '' }}
+      <span class="text-gray-400 text-xs block">
+        {{ tx.created_at ? tx.created_at.slice(11, 19) : '' }}
+      </span>
+    </td>
+
+    <!-- Gallons -->
+    <td class="px-4 py-3 flex items-center gap-2">
+      <span class="text-blue-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path d="M8 20v-5m8 5v-5m3-9a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2h9a2 2 0 002-2V6z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      {{ tx.gallons }} gal
+    </td>
+
+    <!-- Amount -->
+    <td class="px-4 py-3 font-bold">₱{{ tx.total_amount }}</td>
+
+    <!-- Status -->
+    <td class="px-4 py-3">
+      <button
+        v-if="tx.status === 'Collectables'"
+        @click="confirmAndMarkDone(tx)"
+        class="flex items-center gap-2 text-orange-500 hover:text-green-600 transition"
+        style="background: transparent; border: none; padding: 0; cursor: pointer;"
+        title="Mark as Done"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 8v4l3 3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Collectables
+      </button>
+      <span v-else class="flex items-center gap-2 text-green-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          ircle cx="12" cy="12" r="10" />
+          <path d="M16 12l-4 4-4-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Done
+      </span>
+    </td>
+  </tr>
+</tbody>
+
         </table>
       </div>
     </div>
@@ -342,13 +401,13 @@ export default {
     isSaleFormValid() {
       const s = this.sale;
       return (
-        s.customer && s.customer.trim() !== '' &&
+        s.name && s.name.trim() !== '' &&
         (s.purpose === 'Walk-in' || s.purpose === 'Delivery') &&
         s.gallons > 0 &&
-        s.price > 0 &&
-        (s.status === 'Pending' || s.status === 'Paid')
+        s.price_per_gallon > 0 &&
+        (s.status === 'Collectables' || s.status === 'Done')
       );
-    }
+    },
   },
   methods: {
     ...mapActions(useSalesStore, [
@@ -357,7 +416,11 @@ export default {
       'confirmAndMarkDone',
       'openAddSale',
       'closeAddSale',
+      'fetchTransactions',
     ]),
+  },
+  mounted() {
+    this.fetchTransactions();
   },
 };
 </script>
