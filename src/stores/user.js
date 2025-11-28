@@ -9,8 +9,6 @@ export const useUserStore = defineStore('user', () => {
     user.value = { email: payload.email }
   }
 
-  
-
   function logout() {
     user.value = null
   }

@@ -170,7 +170,7 @@
             <div class="flex justify-between items-center mb-2">
               <span class="text-green-500 text-2xl">₱</span>
             </div>
-            <span class="font-semibold text-slate-500">Total Earnings</span>
+            <span class="font-semibold text-slate-500">Gross Revenue</span>
             <span class="font-bold text-xl text-slate-900 mt-1">₱{{ totalEarnings }}</span>
           </div>
           <div class="rounded-xl bg-blue-50 p-5 flex flex-col">
