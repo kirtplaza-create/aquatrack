@@ -1,3 +1,4 @@
+// src/api/axios.js
 import axios from "axios";
 
 const api = axios.create({
@@ -11,6 +12,8 @@ const api = axios.create({
 // when app starts, if we already have a token, attach it
 const token = localStorage.getItem("auth_token");
 if (token) {
+  // This assumes your simple.token middleware reads the Authorization header
+  // e.g. Authorization: Bearer <token>
   api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 }
 

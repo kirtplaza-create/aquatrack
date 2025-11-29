@@ -1,4 +1,4 @@
-// stores/useSalesStore.js
+// src/stores/useSalesStore.js
 import { defineStore } from "pinia";
 import api from "../api/axios";
 
@@ -6,15 +6,23 @@ export const useSalesStore = defineStore("sales", {
   state: () => ({
     showAddSale: false,
     sale: {
-      name: "",              // customer name (sales.name)
+      id: null,
+      name: "",
       purpose: "",
       gallons: 1,
-      price_per_gallon: 15,  // sales.price_per_gallon
+      price_per_gallon: 15,
       status: "",
     },
     activeFilter: "All",
     searchQuery: "",
-    transactions: [],        // holds rows from /api/sales
+    transactions: [],
+    editingId: null,
+
+    // delete confirmation state
+    confirmDeleteModal: {
+      show: false,
+      targetTx: null,
+    },
   }),
 
   getters: {
@@ -22,7 +30,7 @@ export const useSalesStore = defineStore("sales", {
       const gallons = Number(state.sale.gallons) || 0;
       const price = Number(state.sale.price_per_gallon) || 0;
       const total = gallons * price;
-      return `₱${total}`;
+      return `₱${total.toFixed(2)}`;
     },
 
     filteredTransactions(state) {
@@ -120,7 +128,30 @@ export const useSalesStore = defineStore("sales", {
       }
     },
 
-    // POST /api/sales
+    openAddSale() {
+      this.editingId = null;
+      this.sale = {
+        id: null,
+        name: "",
+        purpose: "",
+        gallons: 1,
+        price_per_gallon: 15,
+        status: "",
+      };
+      this.showAddSale = true;
+    },
+
+    openEditSale(tx) {
+      this.editingId = tx.id;
+      this.sale = { ...tx };
+      this.showAddSale = true;
+    },
+
+    closeAddSale() {
+      this.showAddSale = false;
+    },
+
+    // POST or PUT /api/sales
     async saveSale() {
       if (!this.sale.name || !this.sale.purpose || !this.sale.status) {
         alert("Please fill out customer name, purpose, and status.");
@@ -141,20 +172,28 @@ export const useSalesStore = defineStore("sales", {
       };
 
       try {
-        console.log("SENDING TO /sales", payload);
-        const res = await api.post("/sales", payload);
-        const savedSale = res.data;
-
-        this.transactions.push(savedSale);
+        let savedSale;
+        if (this.editingId) {
+          const res = await api.put(`/sales/${this.editingId}`, payload);
+          savedSale = res.data;
+          const idx = this.transactions.findIndex(
+            (t) => t.id === this.editingId
+          );
+          if (idx !== -1) this.transactions[idx] = savedSale;
+        } else {
+          const res = await api.post("/sales", payload);
+          savedSale = res.data;
+          this.transactions.push(savedSale);
+        }
 
         alert(
-          `Sale saved for ${savedSale.name}, amount: ₱${
-            savedSale.total_amount ?? total
-          }`
+          `Sale saved for ${savedSale.name}, amount: ₱${savedSale.total_amount}`
         );
 
         this.showAddSale = false;
+        this.editingId = null;
         this.sale = {
+          id: null,
           name: "",
           purpose: "",
           gallons: 1,
@@ -171,7 +210,6 @@ export const useSalesStore = defineStore("sales", {
       this.activeFilter = filter;
     },
 
-    // user clicks on Collectables → confirm → call backend
     confirmAndMarkDone(tx) {
       if (window.confirm("Confirm the payment?")) {
         this.markSaleDone(tx);
@@ -179,7 +217,7 @@ export const useSalesStore = defineStore("sales", {
       }
     },
 
-    // PUT /api/sales/{id} to set status = Done
+    // PUT /api/sales/{id} status = Done
     async markSaleDone(tx) {
       if (!tx || !tx.id) {
         alert("Cannot mark sale as done: missing ID.");
@@ -187,28 +225,82 @@ export const useSalesStore = defineStore("sales", {
       }
 
       const originalStatus = tx.status;
-      // Optimistic update: update UI first
       tx.status = "Done";
 
       try {
-        await api.put(`/sales/${tx.id}`, {
-          status: "Done",
-        });
-        // success: nothing else to do
+        await api.put(`/sales/${tx.id}`, { status: "Done" });
       } catch (error) {
         console.error("Error updating sale status:", error.response ?? error);
-        // rollback if API fails
         tx.status = originalStatus;
         alert("Failed to update status on server.");
       }
     },
 
-    openAddSale() {
-      this.showAddSale = true;
+    // OLD direct delete (not used by UI)
+    async deleteTransaction(tx) {
+      if (!tx || !tx.id) {
+        alert("Cannot delete: missing ID.");
+        return;
+      }
+
+      try {
+        await api.delete(`/sales/${tx.id}`);
+        this.transactions = this.transactions.filter((t) => t.id !== tx.id);
+      } catch (error) {
+        console.error("Error deleting sale:", error.response ?? error);
+        alert("Failed to delete sale on server.");
+      }
     },
 
-    closeAddSale() {
-      this.showAddSale = false;
+    // ===== Admin-password delete flow =====
+
+    openConfirmDelete(tx) {
+      this.confirmDeleteModal.show = true;
+      this.confirmDeleteModal.targetTx = tx;
+    },
+
+    closeConfirmDelete() {
+      this.confirmDeleteModal.show = false;
+      this.confirmDeleteModal.targetTx = null;
+    },
+
+    // password is passed in from the component
+    async confirmDeleteWithPassword(password) {
+      if (!password) {
+        alert("Please enter admin password.");
+        return;
+      }
+
+      const tx = this.confirmDeleteModal.targetTx;
+      if (!tx || !tx.id) {
+        alert("Missing transaction.");
+        return;
+      }
+
+      try {
+        // 1) verify password with backend
+        const confirmRes = await api.post("/admin/confirm-password", {
+          password,
+        });
+        console.log("CONFIRM RESPONSE", confirmRes.status, confirmRes.data);
+
+        // 2) if OK, delete sale
+        const delRes = await api.delete(`/sales/${tx.id}`);
+        console.log("DELETE RESPONSE", delRes.status, delRes.data);
+
+        this.transactions = this.transactions.filter((t) => t.id !== tx.id);
+        this.closeConfirmDelete();
+      } catch (error) {
+        const res = error.response;
+        console.error("CONFIRM DELETE ERROR", res ?? error);
+        if (res) {
+          alert(
+            `Confirm/delete failed: ${res.status} ${JSON.stringify(res.data)}`
+          );
+        } else {
+          alert("Confirm/delete failed: no response from server.");
+        }
+      }
     },
   },
 });
