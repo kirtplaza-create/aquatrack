@@ -1,11 +1,10 @@
 <template>
   <div
-  :class="[
-    'relative min-h-screen max-w-full overflow-x-hidden bg-white py-6 px-4 md:px-8 space-y-8',
-    showAddSale || confirmDeleteModal.show ? 'overflow-hidden' : ''
-  ]"
->
-
+    :class="[
+      'relative min-h-screen max-w-full overflow-x-hidden bg-white py-6 px-4 md:px-8 space-y-8',
+      showAddSale || confirmDeleteModal.show ? 'overflow-hidden' : ''
+    ]"
+  >
     <!-- Top Greeting Banner -->
     <div
       class="rounded-2xl bg-gradient-to-r from-[#246af3] via-[#357Cf5] to-[#3588ff] text-white py-6 px-10 flex justify-between items-center shadow-lg"
@@ -355,7 +354,7 @@
                 stroke-width="2"
               >
                 ircle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                <path d="M21 21l-4.3-4.3" />
               </svg>
             </span>
           </div>
@@ -606,7 +605,6 @@ export default {
       "showAddSale",
       "sale",
       "activeFilter",
-      "searchQuery",
       "transactions",
       "confirmDeleteModal",
     ]),
@@ -624,6 +622,19 @@ export default {
       "deliveryRefills",
       "totalGallonsDispensed",
     ]),
+
+    // writable computed so v-model works with Pinia state
+    searchQuery: {
+      get() {
+        const store = useSalesStore();
+        return store.searchQuery;
+      },
+      set(value) {
+        const store = useSalesStore();
+        store.searchQuery = value;
+      },
+    },
+
     isSaleFormValid() {
       const s = this.sale;
       return (
