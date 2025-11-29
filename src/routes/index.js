@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import LoginPage from '../pages/LoginPage.vue'
 import Dashboard from '../pages/Dashboard.vue'
 import SalesRecord from '../pages/SalesRecord.vue'
+import Statistics from '../pages/Statistics.vue' // added
+
 const routes = [
   {
     path: '/',
@@ -12,30 +14,32 @@ const routes = [
     path: '/dashboard',
     name: 'Dashboard',
     component: Dashboard
-    // meta: { requiresAuth: true } // add this if you use auth guards
+    // meta: { requiresAuth: true }
   },
   {
-    path: '/sales',    // or '/sales-record' or whatever URL you prefer
+    path: '/sales', // or '/sales-record'
     name: 'SalesRecord',
     component: SalesRecord
-    // meta: { requiresAuth: true } // add this if you use auth guards
+    // meta: { requiresAuth: true }
   },
-  // Add other routes here...
+  {
+    path: '/statistics',
+    name: 'Statistics',
+    component: Statistics
+  },
   {
     path: '/account',
     name: 'Account',
     component: () => import('../pages/Account.vue')
   },
-
   {
-    path:'/settings',
-    name:'Settings',
+    path: '/settings',
+    name: 'Settings',
     component: () => import('../pages/Settings.vue')
   },
-
   {
-    path:'/logout',
-    name:'Logout',
+    path: '/logout',
+    name: 'Logout',
     component: () => import('../pages/Logout.vue')
   }
 ]

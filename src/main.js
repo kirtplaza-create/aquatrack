@@ -6,19 +6,21 @@ import './index.css'
 
 import LoginPage from './pages/LoginPage.vue'
 import Dashboard from './pages/Dashboard.vue'
+import Statistics from './pages/Statistics.vue'
 
 const routes = [
   { path: '/', component: LoginPage },
   { path: '/dashboard', component: Dashboard },
-  {path: '/sales', component: () => import('./pages/SalesRecord.vue') },
-  {path: '/account', component: () => import('./pages/Account.vue') },
-  {path: '/settings', component: () => import('./pages/Settings.vue') },
-  {path: '/logout', component: () => import('./pages/Logout.vue') }
+  { path: '/sales', component: () => import('./pages/SalesRecord.vue') },
+  { path: '/statistics', component: Statistics },
+  { path: '/account', component: () => import('./pages/Account.vue') },
+  { path: '/settings', component: () => import('./pages/Settings.vue') },
+  { path: '/logout', component: () => import('./pages/Logout.vue') }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
 })
 
 const app = createApp(App)

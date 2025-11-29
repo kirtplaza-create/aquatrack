@@ -26,95 +26,123 @@ export const useSalesStore = defineStore("sales", {
   }),
 
   getters: {
-    totalAmount(state) {
-      const gallons = Number(state.sale.gallons) || 0;
-      const price = Number(state.sale.price_per_gallon) || 0;
-      const total = gallons * price;
-      return `₱${total.toFixed(2)}`;
-    },
-
-    filteredTransactions(state) {
-      let txs =
-        state.activeFilter === "All"
-          ? state.transactions
-          : state.transactions.filter((tx) => tx.status === state.activeFilter);
-
-      if (state.searchQuery.trim()) {
-        const q = state.searchQuery.toLowerCase();
-        txs = txs.filter((tx) =>
-          (tx.name || "").toLowerCase().includes(q)
-        );
-      }
-
-      return txs;
-    },
-
-    totalRevenue(state) {
-      return state.transactions.reduce(
-        (sum, tx) => sum + (Number(tx.total_amount) || 0),
-        0
-      );
-    },
-
-    totalCollectables(state) {
-      return state.transactions.filter(
-        (tx) => tx.status === "Collectables"
-      ).length;
-    },
-
-    totalEarnings(state) {
-      return state.transactions
-        .filter((tx) => tx.status === "Done")
-        .reduce((sum, tx) => sum + (Number(tx.total_amount) || 0), 0);
-    },
-
-    totalGallonsSold(state) {
-      return state.transactions.reduce(
-        (sum, tx) => sum + (Number(tx.gallons) || 0),
-        0
-      );
-    },
-
-    totalGallonsDispensed() {
-      return this.totalGallonsSold;
-    },
-
-    avgSalesPerDay(state) {
-      if (state.transactions.length === 0) return "0.00";
-
-      const days = new Set(
-        state.transactions.map((tx) => tx.created_at?.slice(0, 10))
-      );
-      const total = state.transactions.reduce(
-        (sum, tx) => sum + (Number(tx.total_amount) || 0),
-        0
-      );
-
-      return (total / days.size).toFixed(2);
-    },
-
-    totalTransactions(state) {
-      return state.transactions.length;
-    },
-
-    totalCompletedTransactions(state) {
-      return state.transactions.filter((tx) => tx.status === "Done").length;
-    },
-
-    totalRefillsCompleted(state) {
-      return state.transactions.filter((tx) => tx.status === "Done").length;
-    },
-
-    walkInRefills(state) {
-      return state.transactions.filter((tx) => tx.purpose === "Walk-in").length;
-    },
-
-    deliveryRefills(state) {
-      return state.transactions.filter(
-        (tx) => tx.purpose === "Delivery"
-      ).length;
-    },
+  totalAmount(state) {
+    const gallons = Number(state.sale.gallons) || 0;
+    const price = Number(state.sale.price_per_gallon) || 0;
+    const total = gallons * price;
+    return `₱${total.toFixed(2)}`;
   },
+
+  filteredTransactions(state) {
+    let txs =
+      state.activeFilter === "All"
+        ? state.transactions
+        : state.transactions.filter((tx) => tx.status === state.activeFilter);
+
+    if (state.searchQuery.trim()) {
+      const q = state.searchQuery.toLowerCase();
+      txs = txs.filter((tx) =>
+        (tx.name || "").toLowerCase().includes(q)
+      );
+    }
+
+    return txs;
+  },
+
+  totalRevenue(state) {
+    return state.transactions.reduce(
+      (sum, tx) => sum + (Number(tx.total_amount) || 0),
+      0
+    );
+  },
+
+  totalCollectables(state) {
+    return state.transactions.filter(
+      (tx) => tx.status === "Collectables"
+    ).length;
+  },
+
+  totalEarnings(state) {
+    return state.transactions
+      .filter((tx) => tx.status === "Done")
+      .reduce((sum, tx) => sum + (Number(tx.total_amount) || 0), 0);
+  },
+
+  totalGallonsSold(state) {
+    return state.transactions.reduce(
+      (sum, tx) => sum + (Number(tx.gallons) || 0),
+      0
+    );
+  },
+
+  totalGallonsDispensed() {
+    return this.totalGallonsSold;
+  },
+
+  avgSalesPerDay(state) {
+    if (state.transactions.length === 0) return "0.00";
+
+    const days = new Set(
+      state.transactions.map((tx) => tx.created_at?.slice(0, 10))
+    );
+    const total = state.transactions.reduce(
+      (sum, tx) => sum + (Number(tx.total_amount) || 0),
+      0
+    );
+
+    return (total / days.size).toFixed(2);
+  },
+
+  totalTransactions(state) {
+    return state.transactions.length;
+  },
+
+  totalCompletedTransactions(state) {
+    return state.transactions.filter((tx) => tx.status === "Done").length;
+  },
+
+  totalRefillsCompleted(state) {
+    return state.transactions.filter((tx) => tx.status === "Done").length;
+  },
+
+  walkInRefills(state) {
+    return state.transactions.filter((tx) => tx.purpose === "Walk-in").length;
+  },
+
+  deliveryRefills(state) {
+    return state.transactions.filter(
+      (tx) => tx.purpose === "Delivery"
+    ).length;
+  },
+
+  // NEW: highest revenue day
+  peakRevenue(state) {
+    if (!state.transactions || state.transactions.length === 0) {
+      return { amount: 0, date: "" };
+    }
+
+    const revenueByDate = {};
+
+    state.transactions.forEach((tx) => {
+      const date = tx.created_at ? tx.created_at.slice(0, 10) : "Unknown";
+      const amount = Number(tx.total_amount) || 0;
+      revenueByDate[date] = (revenueByDate[date] || 0) + amount;
+    });
+
+    let maxAmount = 0;
+    let maxDate = "";
+
+    Object.entries(revenueByDate).forEach(([date, amount]) => {
+      if (amount > maxAmount) {
+        maxAmount = amount;
+        maxDate = date;
+      }
+    });
+
+    return { amount: maxAmount, date: maxDate };
+  },
+},
+
 
   actions: {
     // GET /api/sales

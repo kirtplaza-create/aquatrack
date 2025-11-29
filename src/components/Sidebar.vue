@@ -1,10 +1,13 @@
 <template>
-  <aside class="fixed left-0 top-0 w-60 h-screen bg-[#101929] text-white flex flex-col py-6 z-20">
+  <aside
+    class="fixed left-0 top-0 w-60 h-screen bg-[#101929] text-white flex flex-col py-6 z-20"
+  >
     <!-- Top logo section -->
     <div>
       <div class="flex items-center gap-3 px-6 mb-8">
-        <div class="flex flex-col items-center justify-center bg-[#246af3] rounded-full h-14 w-14 shadow-lg">
-          <!-- Water icon SVG -->
+        <div
+          class="flex flex-col items-center justify-center bg-[#246af3] rounded-full h-14 w-14 shadow-lg"
+        >
           <div class="flex items-center justify-center">
             <img
               :src="aquatracklogo"
@@ -24,10 +27,19 @@
         <router-link
           to="/dashboard"
           class="flex items-center gap-2 px-6 py-2 rounded-xl text-white font-medium"
-          :class="$route.path === '/dashboard' ? 'bg-[#3586FF]' : 'hover:bg-[#162238] text-[#C7D3E0]'"
+          :class="
+            $route.path === '/dashboard'
+              ? 'bg-[#3586FF]'
+              : 'hover:bg-[#162238] text-[#C7D3E0]'
+          "
         >
-          <!-- Dashboard SVG -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
             <rect x="4" y="4" width="7" height="7" rx="2" fill="currentColor" />
             <rect x="13" y="4" width="7" height="7" rx="2" fill="currentColor" />
             <rect x="4" y="13" width="7" height="7" rx="2" fill="currentColor" />
@@ -39,13 +51,54 @@
         <router-link
           to="/sales"
           class="flex items-center gap-2 px-6 py-2 rounded-xl text-white font-medium"
-          :class="$route.path === '/sales' ? 'bg-[#3586FF]' : 'hover:bg-[#162238] text-[#C7D3E0]'"
+          :class="
+            $route.path === '/sales'
+              ? 'bg-[#3586FF]'
+              : 'hover:bg-[#162238] text-[#C7D3E0]'
+          "
         >
-          <!-- Sales Records SVG -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7v10M17 7v10M7 7h10" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M7 7v10M17 7v10M7 7h10"
+            />
           </svg>
           Sales Records
+        </router-link>
+
+        <!-- NEW: Statistics link -->
+        <router-link
+          to="/statistics"
+          class="flex items-center gap-2 px-6 py-2 rounded-xl text-white font-medium"
+          :class="
+            $route.path === '/statistics'
+              ? 'bg-[#3586FF]'
+              : 'hover:bg-[#162238] text-[#C7D3E0]'
+          "
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 19l4-7 4 4 6-10"
+            />
+          </svg>
+          Statistics
         </router-link>
       </nav>
     </div>
@@ -55,7 +108,11 @@
       <router-link
         to="/account"
         class="flex items-center gap-2 py-2 rounded-xl font-medium"
-        :class="$route.path === '/account' ? 'bg-[#3586FF] text-white' : 'hover:bg-[#162238] text-[#C7D3E0]'"
+        :class="
+          $route.path === '/account'
+            ? 'bg-[#3586FF] text-white'
+            : 'hover:bg-[#162238] text-[#C7D3E0]'
+        "
       >
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
@@ -71,7 +128,11 @@
       <router-link
         to="/settings"
         class="flex items-center gap-2 py-2 rounded-xl font-medium"
-        :class="$route.path === '/settings' ? 'bg-[#3586FF] text-white' : 'hover:bg-[#162238] text-[#C7D3E0]'"
+        :class="
+          $route.path === '/settings'
+            ? 'bg-[#3586FF] text-white'
+            : 'hover:bg-[#162238] text-[#C7D3E0]'
+        "
       >
         <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
