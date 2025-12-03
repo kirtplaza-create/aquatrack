@@ -33,8 +33,9 @@
             </div>
             <div class="font-semibold text-slate-600">Total Revenue</div>
             <div class="text-2xl font-bold text-slate-900 mt-1">
-              ₱{{ totalRevenue }}
-            </div>
+  ₱{{ todayTotal.toLocaleString() }}
+</div>
+
           </div>
           <span
             class="bg-violet-600 text-white px-4 py-1 rounded-full text-sm font-medium"
@@ -135,7 +136,7 @@
           {{ sale.id ? "Edit Sale" : "Add Sales" }}
         </h2>
 
-        <form @submit.prevent="saveSale">
+<form @submit.prevent="handleSaveSale">
           <!-- Customer Name -->
           <div class="mb-4">
             <label class="block text-white mb-1">Customer Name: (Optional)</label>
@@ -483,7 +484,7 @@
                 <button
                   v-if="tx.status === 'Collectables'"
                   type="button"
-                  @click="confirmAndMarkDone(tx)"
+                  @click="handleConfirmAndMarkDone(tx)"
                   class="inline-flex items-center gap-2 text-xs font-semibold text-orange-600 bg-orange-50 px-3 py-1 rounded-full hover:bg-orange-100 hover:text-orange-700 transition"
                   title="Mark as Done"
                 >
@@ -640,17 +641,19 @@
 </template>
 
 <script>
+import api from "../api/axios";
 import { useSalesStore } from "../stores/useSalesStore";
 import { mapState, mapGetters, mapActions } from "pinia";
 
 export default {
   name: "Dashboard",
   data() {
-  return {
-    adminPasswordInput: "",
-    txToEdit: null, // NEW: transaction waiting to be edited
-  };
-},
+    return {
+      adminPasswordInput: "",
+      txToEdit: null,
+      todayTotal: 0, // NEW: backend-driven today total
+    };
+  },
 
   computed: {
     ...mapState(useSalesStore, [
@@ -675,14 +678,13 @@ export default {
       "totalGallonsDispensed",
     ]),
 
-    // NEW: sorted version of filteredTransactions (newest first)
     sortedTransactions() {
       return [...this.filteredTransactions].sort(
         (a, b) => new Date(b.created_at) - new Date(a.created_at)
       );
     },
 
-    // only today's transactions (by date part)
+    // Keep for listing today's transactions (UI), but use todayTotal for the card
     todaysSortedTransactions() {
       const today = new Date();
       const y = today.getFullYear();
@@ -700,7 +702,6 @@ export default {
       });
     },
 
-    // pagination state (stored in Pinia)
     currentPage: {
       get() {
         const store = useSalesStore();
@@ -729,7 +730,6 @@ export default {
       return this.todaysSortedTransactions.slice(start, end);
     },
 
-    // writable computed so v-model works with Pinia state
     searchQuery: {
       get() {
         const store = useSalesStore();
@@ -753,29 +753,51 @@ export default {
       );
     },
   },
+
   methods: {
-    ...mapActions(useSalesStore, [
-      "saveSale",
-      "setFilter",
-      "confirmAndMarkDone",
-      "openAddSale",
-      "closeAddSale",
-      "fetchTransactions",
-      "openEditSale",
-      "deleteTransaction",
-      "openConfirmDelete",
-      "closeConfirmDelete",
-      "confirmDeleteWithPassword",
-    ]),
-    openEdit(tx) {
-      this.openEditSale(tx);
-    },
-    onConfirmDeleteClick() {
-      this.confirmDeleteWithPassword(this.adminPasswordInput);
-    },
+  ...mapActions(useSalesStore, [
+    "saveSale",
+    "setFilter",
+    "confirmAndMarkDone",
+    "openAddSale",
+    "closeAddSale",
+    "fetchTransactions",
+    "openEditSale",
+    "deleteTransaction",
+    "openConfirmDelete",
+    "closeConfirmDelete",
+    "confirmDeleteWithPassword",
+  ]),
+
+  openEdit(tx) {
+    this.openEditSale(tx);
   },
-  mounted() {
-    this.fetchTransactions();
+
+  onConfirmDeleteClick() {
+    this.confirmDeleteWithPassword(this.adminPasswordInput);
+  },
+
+  async loadTodayTotal() {
+    const res = await api.get("/sales/today");
+    this.todayTotal = res.data?.today_total ?? 0;
+  },
+
+  // NEW: wrapper that saves, then refreshes todayTotal
+  async handleSaveSale() {
+    await this.saveSale();       // calls Pinia action
+    await this.loadTodayTotal(); // refresh today card
+  },
+
+  async handleConfirmAndMarkDone(tx) {
+  await this.confirmAndMarkDone(tx); // calls Pinia action
+  await this.loadTodayTotal();       // refresh /sales/today total
+},
+},
+
+
+  async mounted() {
+    await this.fetchTransactions();
+    await this.loadTodayTotal(); // fetch timezone-correct “today” total
   },
 };
 </script>

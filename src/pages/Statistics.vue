@@ -73,9 +73,7 @@
               @click="selectYear(year.value)"
             >
               <div class="font-medium">{{ year.value }}</div>
-              <div class="text-[11px] text-gray-400">
-                ₱{{ formatMoney(year.total) }}
-              </div>
+              
             </button>
           </div>
         </div>
@@ -90,9 +88,10 @@
               class="py-3 rounded-xl border text-center transition"
               :class="
                 idx === selectedMonthIndex
-                  ? 'bg-purple-500 text-white border-purple-500'
+                  ? 'bg-blue-600 text-white border-blue-600'
                   : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-transparent'
               "
+
               @click="selectMonth(idx)"
             >
               <div class="font-medium">{{ m.label }}</div>
@@ -160,7 +159,7 @@
             </div>
           </div>
           <div class="mt-2 text-4xl font-semibold">
-            ₱{{ formatMoney(revenue.selectedPeriodRevenue) }}
+            ₱{{ formatMoney(totalMonthlyRevenue) }}
           </div>
         </div>
 
@@ -180,8 +179,8 @@
             </div>
           </div>
           <div class="text-2xl font-semibold text-gray-900">
-            ₱{{ formatMoney(revenue.averageRevenue) }}
-          </div>
+  ₱{{ formatMoney(averageDailyRevenue) }}
+</div>
         </div>
 
         <!-- Total Revenue -->
@@ -199,9 +198,9 @@
               <div class="text-[11px] text-gray-400">All periods</div>
             </div>
           </div>
-          <div class="text-2xl font-semibold text-gray-900">
-            ₱{{ formatMoney(revenue.totalRevenue) }}
-          </div>
+         <div class="text-2xl font-semibold text-gray-900">
+  ₱{{ formatMoney(totalMonthlyRevenue) }}
+</div>
         </div>
       </div>
     </div>
@@ -264,13 +263,45 @@ const viewMode = ref('month');
 const yearsWindowStart = ref(2020);
 
 // selected date pieces
-const now = new Date();
-const selectedYear = ref(now.getFullYear());
-const selectedMonthIndex = ref(now.getMonth());
-const selectedDay = ref(now.getDate());
+const now = new Date()
+const selectedYear = ref(now.getFullYear())
+const selectedMonthIndex = ref(now.getMonth())
+const selectedDay = ref(null) // <- was now.getDate()
+
 
 // cache: graph always uses these (month) points
 const monthPoints = ref([]);
+const monthlyTotals = computed(() => {
+  const sums = Array(12).fill(0)
+
+  for (const p of revenue.yearPoints) {
+    const d = new Date(p.date)
+    if (d.getFullYear() === selectedYear.value) {
+      sums[d.getMonth()] += Number(p.amount || 0)
+    }
+  }
+
+  return sums
+})
+
+
+// ------- REVENUE TOTAL & AVERAGE -------
+
+// total revenue for the loaded month
+const totalMonthlyRevenue = computed(() =>
+  monthPoints.value.reduce((sum, p) => sum + Number(p.amount || 0), 0)
+)
+
+// number of days that actually have revenue (avoid divide by 0)
+const daysWithRevenueCount = computed(() => {
+  const count = monthPoints.value.filter(p => Number(p.amount || 0) > 0).length
+  return count || 1
+})
+
+// average revenue per day that has data
+const averageDailyRevenue = computed(() =>
+  totalMonthlyRevenue.value / daysWithRevenueCount.value
+)
 
 // helpers
 const yearsRangeLabel = computed(
@@ -286,13 +317,16 @@ const yearCards = computed(() => {
 });
 
 const monthCards = computed(() => {
-  const labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return labels.map((label) => ({
+  const labels = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+
+  return labels.map((label, idx) => ({
     key: label,
     label,
-    total: 0,
+    total: monthlyTotals.value[idx] || 0,
   }));
 });
+
+
 
 const daysInMonth = computed(() => {
   const year = selectedYear.value;
@@ -325,65 +359,77 @@ function stepUp() {
 
 async function shift(offset) {
   if (viewMode.value === 'years') {
-    yearsWindowStart.value += offset * 12;
-    return;
+    yearsWindowStart.value += offset * 12
+    return
   }
 
   if (viewMode.value === 'year') {
-    selectedYear.value += offset;
-    await fetchForMonth(selectedYear.value, selectedMonthIndex.value);
-    return;
+    selectedYear.value += offset
+    selectedDay.value = null
+    await fetchForMonth(selectedYear.value, selectedMonthIndex.value)
+    return
   }
 
   // month view
-  let month = selectedMonthIndex.value + offset;
-  let year = selectedYear.value;
+  let month = selectedMonthIndex.value + offset
+  let year = selectedYear.value
 
   if (month < 0) {
-    month = 11;
-    year -= 1;
+    month = 11
+    year -= 1
   } else if (month > 11) {
-    month = 0;
-    year += 1;
+    month = 0
+    year += 1
   }
 
-  selectedYear.value = year;
-  selectedMonthIndex.value = month;
-  selectedDay.value = 1;
-  await fetchForMonth(year, month);
+  selectedYear.value = year
+  selectedMonthIndex.value = month
+  selectedDay.value = null
+  await fetchForMonth(year, month)
 }
+
+onMounted(async () => {
+  await revenue.fetchYearStats(selectedYear.value)
+  await fetchForMonth(selectedYear.value, selectedMonthIndex.value)
+})
 
 async function selectYear(year) {
-  selectedYear.value = year;
-  selectedMonthIndex.value = 0;
-  selectedDay.value = 1;
-  viewMode.value = 'year';
-  await fetchForMonth(selectedYear.value, selectedMonthIndex.value);
+  selectedYear.value = year
+  selectedMonthIndex.value = 0
+  selectedDay.value = null
+  viewMode.value = 'year'
+  await revenue.fetchYearStats(selectedYear.value)
+  await fetchForMonth(selectedYear.value, selectedMonthIndex.value)
 }
+
 
 async function selectMonth(idx) {
-  selectedMonthIndex.value = idx;
-  selectedDay.value = 1;
-  viewMode.value = 'month';
-  // clicking a month: load full month (cards + graph)
-  await fetchForMonth(selectedYear.value, idx);
+  selectedMonthIndex.value = idx
+  selectedDay.value = null
+  viewMode.value = 'month'
+  await fetchForMonth(selectedYear.value, idx)
 }
 
-// clicking a day: load that day for cards only, keep graph on monthPoints
-async function selectDay(day) {
-  selectedDay.value = day;
 
-  const year = selectedYear.value;
-  const month = String(selectedMonthIndex.value + 1).padStart(2, '0');
-  const dd = String(day).padStart(2, '0');
-  const from = `${year}-${month}-${dd}`;
-  const to = from;
+// clicking a day: load that day for cards + graph
+async function selectDay(day) {
+  selectedDay.value = day
+
+  const year = selectedYear.value
+  const month = String(selectedMonthIndex.value + 1).padStart(2, '0')
+  const dd = String(day).padStart(2, '0')
+  const from = `${year}-${month}-${dd}`
+  const to = from
 
   // fetch stats for the single day
-  await revenue.fetchStats(from, to);
+  await revenue.fetchStats(from, to)
 
-  // DO NOT touch monthPoints; graph uses monthPoints only
+  // now graph + totals use just this day
+  monthPoints.value = Array.isArray(revenue.points)
+    ? JSON.parse(JSON.stringify(revenue.points))
+    : []
 }
+
 
 async function fetchForMonth(year, monthIndex) {
   const month = String(monthIndex + 1).padStart(2, '0');
