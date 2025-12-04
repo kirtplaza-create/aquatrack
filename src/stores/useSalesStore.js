@@ -18,159 +18,136 @@ export const useSalesStore = defineStore("sales", {
     transactions: [],
     editingId: null,
 
-    // delete confirmation state
-    confirmDeleteModal: {
+    // generic admin confirmation modal (delete + update)
+    adminConfirmModal: {
       show: false,
-      targetTx: null,
+      mode: null,     // 'delete' | 'update'
+      targetTx: null, // transaction to act on
     },
   }),
 
   getters: {
-  totalAmount(state) {
-    const gallons = Number(state.sale.gallons) || 0;
-    const price = Number(state.sale.price_per_gallon) || 0;
-    const total = gallons * price;
-    return `₱${total.toFixed(2)}`;
-  },
+    totalAmount(state) {
+      const gallons = Number(state.sale.gallons) || 0;
+      const price = Number(state.sale.price_per_gallon) || 0;
+      const total = gallons * price;
+      return `₱${total.toFixed(2)}`;
+    },
 
-  filteredTransactions(state) {
-    let txs =
-      state.activeFilter === "All"
-        ? state.transactions
-        : state.transactions.filter((tx) => tx.status === state.activeFilter);
+    filteredTransactions(state) {
+      let txs =
+        state.activeFilter === "All"
+          ? state.transactions
+          : state.transactions.filter((tx) => tx.status === state.activeFilter);
 
-    if (state.searchQuery.trim()) {
-      const q = state.searchQuery.toLowerCase();
-      txs = txs.filter((tx) => (tx.name || "").toLowerCase().includes(q));
-    }
-
-    return txs;
-  },
-
-  // ===== TODAY TOTALS FOR DASHBOARD CARDS =====
-  totalRevenue(state) {
-    const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
-    return state.transactions
-      .filter(
-        (tx) =>
-          tx.created_at && tx.created_at.slice(0, 10) === today
-      )
-      .reduce((sum, tx) => sum + (Number(tx.total_amount) || 0), 0);
-  },
-
-  totalCollectables(state) {
-    const today = new Date().toISOString().slice(0, 10);
-    return state.transactions.filter(
-      (tx) =>
-        tx.status === "Collectables" &&
-        tx.created_at &&
-        tx.created_at.slice(0, 10) === today
-    ).length;
-  },
-
-
- totalRevenue(state) {
-  const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
-  return state.transactions
-    .filter(
-      (tx) =>
-        tx.created_at &&
-        tx.created_at.slice(0, 10) === today
-    )
-    .reduce((sum, tx) => sum + (Number(tx.total_amount) || 0), 0);
-},
-
-totalCollectables(state) {
-  const today = new Date().toISOString().slice(0, 10);
-  return state.transactions.filter(
-    (tx) =>
-      tx.status === "Collectables" &&
-      tx.created_at &&
-      tx.created_at.slice(0, 10) === today
-  ).length;
-},
-
-  totalEarnings(state) {
-    return state.transactions
-      .filter((tx) => tx.status === "Done")
-      .reduce((sum, tx) => sum + (Number(tx.total_amount) || 0), 0);
-  },
-
-  totalGallonsSold(state) {
-    return state.transactions.reduce(
-      (sum, tx) => sum + (Number(tx.gallons) || 0),
-      0
-    );
-  },
-
-  totalGallonsDispensed() {
-    return this.totalGallonsSold;
-  },
-
-  avgSalesPerDay(state) {
-    if (state.transactions.length === 0) return "0.00";
-
-    const days = new Set(
-      state.transactions.map((tx) => tx.created_at?.slice(0, 10))
-    );
-    const total = state.transactions.reduce(
-      (sum, tx) => sum + (Number(tx.total_amount) || 0),
-      0
-    );
-
-    return (total / days.size).toFixed(2);
-  },
-
-  totalTransactions(state) {
-    return state.transactions.length;
-  },
-
-  totalCompletedTransactions(state) {
-    return state.transactions.filter((tx) => tx.status === "Done").length;
-  },
-
-  totalRefillsCompleted(state) {
-    return state.transactions.filter((tx) => tx.status === "Done").length;
-  },
-
-  walkInRefills(state) {
-    return state.transactions.filter((tx) => tx.purpose === "Walk-in").length;
-  },
-
-  deliveryRefills(state) {
-    return state.transactions.filter(
-      (tx) => tx.purpose === "Delivery"
-    ).length;
-  },
-
-  // NEW: highest revenue day
-  peakRevenue(state) {
-    if (!state.transactions || state.transactions.length === 0) {
-      return { amount: 0, date: "" };
-    }
-
-    const revenueByDate = {};
-
-    state.transactions.forEach((tx) => {
-      const date = tx.created_at ? tx.created_at.slice(0, 10) : "Unknown";
-      const amount = Number(tx.total_amount) || 0;
-      revenueByDate[date] = (revenueByDate[date] || 0) + amount;
-    });
-
-    let maxAmount = 0;
-    let maxDate = "";
-
-    Object.entries(revenueByDate).forEach(([date, amount]) => {
-      if (amount > maxAmount) {
-        maxAmount = amount;
-        maxDate = date;
+      if (state.searchQuery.trim()) {
+        const q = state.searchQuery.toLowerCase();
+        txs = txs.filter((tx) => (tx.name || "").toLowerCase().includes(q));
       }
-    });
 
-    return { amount: maxAmount, date: maxDate };
+      return txs;
+    },
+
+    totalRevenue(state) {
+      const today = new Date().toISOString().slice(0, 10);
+      return state.transactions
+        .filter(
+          (tx) =>
+            tx.created_at &&
+            tx.created_at.slice(0, 10) === today
+        )
+        .reduce((sum, tx) => sum + (Number(tx.total_amount) || 0), 0);
+    },
+
+    totalCollectables(state) {
+      const today = new Date().toISOString().slice(0, 10);
+      return state.transactions.filter(
+        (tx) =>
+          tx.status === "Collectables" &&
+          tx.created_at &&
+          tx.created_at.slice(0, 10) === today
+      ).length;
+    },
+
+    totalEarnings(state) {
+      return state.transactions
+        .filter((tx) => tx.status === "Done")
+        .reduce((sum, tx) => sum + (Number(tx.total_amount) || 0), 0);
+    },
+
+    totalGallonsSold(state) {
+      return state.transactions.reduce(
+        (sum, tx) => sum + (Number(tx.gallons) || 0),
+        0
+      );
+    },
+
+    totalGallonsDispensed() {
+      return this.totalGallonsSold;
+    },
+
+    avgSalesPerDay(state) {
+      if (state.transactions.length === 0) return "0.00";
+
+      const days = new Set(
+        state.transactions.map((tx) => tx.created_at?.slice(0, 10))
+      );
+      const total = state.transactions.reduce(
+        (sum, tx) => sum + (Number(tx.total_amount) || 0),
+        0
+      );
+
+      return (total / days.size).toFixed(2);
+    },
+
+    totalTransactions(state) {
+      return state.transactions.length;
+    },
+
+    totalCompletedTransactions(state) {
+      return state.transactions.filter((tx) => tx.status === "Done").length;
+    },
+
+    totalRefillsCompleted(state) {
+      return state.transactions.filter((tx) => tx.status === "Done").length;
+    },
+
+    walkInRefills(state) {
+      return state.transactions.filter((tx) => tx.purpose === "Walk-in").length;
+    },
+
+    deliveryRefills(state) {
+      return state.transactions.filter(
+        (tx) => tx.purpose === "Delivery"
+      ).length;
+    },
+
+    peakRevenue(state) {
+      if (!state.transactions || state.transactions.length === 0) {
+        return { amount: 0, date: "" };
+      }
+
+      const revenueByDate = {};
+
+      state.transactions.forEach((tx) => {
+        const date = tx.created_at ? tx.created_at.slice(0, 10) : "Unknown";
+        const amount = Number(tx.total_amount) || 0;
+        revenueByDate[date] = (revenueByDate[date] || 0) + amount;
+      });
+
+      let maxAmount = 0;
+      let maxDate = "";
+
+      Object.entries(revenueByDate).forEach(([date, amount]) => {
+        if (amount > maxAmount) {
+          maxAmount = amount;
+          maxDate = date;
+        }
+      });
+
+      return { amount: maxAmount, date: maxDate };
+    },
   },
-},
-
 
   actions: {
     // GET /api/sales
@@ -207,7 +184,7 @@ totalCollectables(state) {
       this.showAddSale = false;
     },
 
-    // POST or PUT /api/sales
+    // CREATE (no password)
     async saveSale() {
       if (!this.sale.name || !this.sale.purpose || !this.sale.status) {
         alert("Please fill out customer name, purpose, and status.");
@@ -230,6 +207,7 @@ totalCollectables(state) {
       try {
         let savedSale;
         if (this.editingId) {
+          // we will NOT use this branch for update with password anymore
           const res = await api.put(`/sales/${this.editingId}`, payload);
           savedSale = res.data;
           const idx = this.transactions.findIndex(
@@ -292,7 +270,7 @@ totalCollectables(state) {
       }
     },
 
-    // OLD direct delete (not used by UI)
+    // OLD direct delete (not used by UI now)
     async deleteTransaction(tx) {
       if (!tx || !tx.id) {
         alert("Cannot delete: missing ID.");
@@ -308,41 +286,42 @@ totalCollectables(state) {
       }
     },
 
-    // ===== Admin-password delete flow =====
+    // ===== Admin-password flows =====
 
     openConfirmDelete(tx) {
-      this.confirmDeleteModal.show = true;
-      this.confirmDeleteModal.targetTx = tx;
+      this.adminConfirmModal.show = true;
+      this.adminConfirmModal.mode = "delete";
+      this.adminConfirmModal.targetTx = tx;
+    },
+
+    openConfirmUpdate(tx) {
+      this.adminConfirmModal.show = true;
+      this.adminConfirmModal.mode = "update";
+      this.adminConfirmModal.targetTx = tx;
     },
 
     closeConfirmDelete() {
-      this.confirmDeleteModal.show = false;
-      this.confirmDeleteModal.targetTx = null;
+      this.adminConfirmModal.show = false;
+      this.adminConfirmModal.mode = null;
+      this.adminConfirmModal.targetTx = null;
     },
 
-    // password is passed in from the component
+    // DELETE with password
     async confirmDeleteWithPassword(password) {
       if (!password) {
         alert("Please enter admin password.");
         return;
       }
 
-      const tx = this.confirmDeleteModal.targetTx;
+      const tx = this.adminConfirmModal.targetTx;
       if (!tx || !tx.id) {
         alert("Missing transaction.");
         return;
       }
 
       try {
-        // 1) verify password with backend
-        const confirmRes = await api.post("/admin/confirm-password", {
-          password,
-        });
-        console.log("CONFIRM RESPONSE", confirmRes.status, confirmRes.data);
-
-        // 2) if OK, delete sale
-        const delRes = await api.delete(`/sales/${tx.id}`);
-        console.log("DELETE RESPONSE", delRes.status, delRes.data);
+        await api.post("/admin/confirm-password", { password });
+        await api.delete(`/sales/${tx.id}`);
 
         this.transactions = this.transactions.filter((t) => t.id !== tx.id);
         this.closeConfirmDelete();
@@ -358,6 +337,57 @@ totalCollectables(state) {
         }
       }
     },
-    
+
+    // UPDATE with password
+    async confirmUpdateWithPassword(password, updatedSale) {
+      if (!password) {
+        alert("Please enter admin password.");
+        return;
+      }
+
+      if (!updatedSale || !updatedSale.id) {
+        alert("Missing sale to update.");
+        return;
+      }
+
+      try {
+        // 1) verify password
+        await api.post("/admin/confirm-password", { password });
+
+        // 2) build payload
+        const gallons = Number(updatedSale.gallons) || 0;
+        const price = Number(updatedSale.price_per_gallon) || 0;
+        const total = gallons * price;
+
+        const payload = {
+          name: updatedSale.name,
+          purpose: updatedSale.purpose,
+          gallons,
+          price_per_gallon: price,
+          total_amount: total,
+          status: updatedSale.status,
+        };
+
+        // 3) PUT /sales/{id}
+        const res = await api.put(`/sales/${updatedSale.id}`, payload);
+        const savedSale = res.data;
+
+        // 4) update local list
+        const idx = this.transactions.findIndex((t) => t.id === updatedSale.id);
+        if (idx !== -1) this.transactions[idx] = savedSale;
+
+        this.closeConfirmDelete();
+      } catch (error) {
+        const res = error.response;
+        console.error("CONFIRM UPDATE ERROR", res ?? error);
+        if (res) {
+          alert(
+            `Confirm/update failed: ${res.status} ${JSON.stringify(res.data)}`
+          );
+        } else {
+          alert("Confirm/update failed: no response from server.");
+        }
+      }
+    },
   },
 });

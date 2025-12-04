@@ -2,7 +2,7 @@
   <div
     :class="[
       'relative min-h-screen max-w-full overflow-x-hidden bg-white py-6 px-4 md:px-8 space-y-8',
-      showAddSale || confirmDeleteModal.show ? 'overflow-hidden' : ''
+      showAddSale || adminConfirmModal.show ? 'overflow-hidden' : ''
     ]"
   >
     <!-- Top Greeting Banner -->
@@ -33,9 +33,8 @@
             </div>
             <div class="font-semibold text-slate-600">Total Revenue</div>
             <div class="text-2xl font-bold text-slate-900 mt-1">
-  ₱{{ todayTotal.toLocaleString() }}
-</div>
-
+              ₱{{ todayTotal.toLocaleString() }}
+            </div>
           </div>
           <span
             class="bg-violet-600 text-white px-4 py-1 rounded-full text-sm font-medium"
@@ -60,7 +59,7 @@
                 stroke="currentColor"
                 stroke-width="2"
               >
-                <circle cx="12" cy="12" r="10" />
+                ircle cx="12" cy="12" r="10" />
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -119,7 +118,6 @@
       v-if="showAddSale"
       class="fixed inset-0 z-40 flex items-center justify-center"
     >
-      <!-- Fullscreen blurred overlay -->
       <div class="fixed inset-0 bg-black/40 backdrop-blur-lg"></div>
 
       <div
@@ -136,7 +134,7 @@
           {{ sale.id ? "Edit Sale" : "Add Sales" }}
         </h2>
 
-<form @submit.prevent="handleSaveSale">
+        <form @submit.prevent="handleSaveSale">
           <!-- Customer Name -->
           <div class="mb-4">
             <label class="block text-white mb-1">Customer Name: (Optional)</label>
@@ -357,7 +355,7 @@
                 stroke="currentColor"
                 stroke-width="2"
               >
-                <circle cx="11" cy="11" r="8" />
+                ircle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.3-4.3" />
               </svg>
             </span>
@@ -415,12 +413,11 @@
             </tr>
           </thead>
           <tbody>
-           <tr
-            v-for="tx in paginatedTodayTransactions"
-            :key="tx.id"
-            class="border-b last:border-0 transition duration-150 hover:bg-blue-50"
-          >
-
+            <tr
+              v-for="tx in paginatedTodayTransactions"
+              :key="tx.id"
+              class="border-b last:border-0 transition duration-150 hover:bg-blue-50"
+            >
               <!-- Customer -->
               <td class="px-4 py-3 flex items-center gap-3">
                 <span
@@ -496,7 +493,7 @@
                     stroke="currentColor"
                     stroke-width="2"
                   >
-                    <circle cx="12" cy="12" r="10" />
+                    ircle cx="12" cy="12" r="10" />
                     <path
                       d="M12 8v4l3 3"
                       stroke-linecap="round"
@@ -517,7 +514,7 @@
                     stroke="currentColor"
                     stroke-width="2"
                   >
-                    <circle cx="12" cy="12" r="10" />
+                    ircle cx="12" cy="12" r="10" />
                     <path
                       d="M16 12l-4 4-4-4"
                       stroke-linecap="round"
@@ -550,66 +547,63 @@
             </tr>
           </tbody>
         </table>
-            <div class="flex items-center justify-between mt-4">
-      <p class="text-sm text-gray-500">
-        Showing
-        <span class="font-semibold">
-          {{ paginatedTodayTransactions.length }}
-        </span>
-        of
-        <span class="font-semibold">
-          {{ todaysSortedTransactions.length }}
-        </span>
-        transactions today
-      </p>
 
-      <div class="flex items-center gap-2">
-        <button
-          type="button"
-          class="px-3 py-1 rounded-lg text-sm font-medium border border-gray-300 text-gray-700 disabled:opacity-40"
-          :disabled="currentPage === 1"
-          @click="currentPage--"
-        >
-          Prev
-        </button>
+        <div class="flex items-center justify-between mt-4">
+          <p class="text-sm text-gray-500">
+            Showing
+            <span class="font-semibold">
+              {{ paginatedTodayTransactions.length }}
+            </span>
+            of
+            <span class="font-semibold">
+              {{ todaysSortedTransactions.length }}
+            </span>
+            transactions today
+          </p>
 
-        <span class="text-sm text-gray-600">
-          Page {{ currentPage }} of {{ totalPages }}
-        </span>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              class="px-3 py-1 rounded-lg text-sm font-medium border border-gray-300 text-gray-700 disabled:opacity-40"
+              :disabled="currentPage === 1"
+              @click="currentPage--"
+            >
+              Prev
+            </button>
 
-        <button
-          type="button"
-          class="px-3 py-1 rounded-lg text-sm font-medium border border-gray-300 text-gray-700 disabled:opacity-40"
-          :disabled="currentPage === totalPages"
-          @click="currentPage++"
-        >
-          Next
-        </button>
+            <span class="text-sm text-gray-600">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+
+            <button
+              type="button"
+              class="px-3 py-1 rounded-lg text-sm font-medium border border-gray-300 text-gray-700 disabled:opacity-40"
+              :disabled="currentPage === totalPages"
+              @click="currentPage++"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
-      </div>
-    </div>
-
-    
-
-    <!-- Admin password confirmation for delete -->
+    <!-- Admin password confirmation (delete + update) -->
     <div
-      v-if="confirmDeleteModal.show"
+      v-if="adminConfirmModal.show"
       class="fixed inset-0 z-50 flex items-center justify-center"
     >
-      <!-- Fullscreen blurred overlay -->
       <div class="fixed inset-0 bg-black/40 backdrop-blur-lg"></div>
 
-      <!-- Modal card with smooth animation -->
       <div
         class="relative z-50 bg-white rounded-2xl p-6 w-full max-w-sm shadow-lg animate-fadeIn"
       >
         <h3 class="text-lg font-semibold text-gray-800 mb-2">
-          Confirm Delete
+          {{ adminConfirmModal.mode === 'update' ? 'Confirm Update' : 'Confirm Delete' }}
         </h3>
         <p class="text-sm text-gray-600 mb-4">
-          Enter the admin password to delete this transaction.
+          Enter the admin password to
+          {{ adminConfirmModal.mode === 'update' ? 'update this transaction.' : 'delete this transaction.' }}
         </p>
 
         <input
@@ -632,7 +626,7 @@
             class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700"
             @click="onConfirmDeleteClick"
           >
-            Confirm Delete
+            Confirm
           </button>
         </div>
       </div>
@@ -651,7 +645,7 @@ export default {
     return {
       adminPasswordInput: "",
       txToEdit: null,
-      todayTotal: 0, // NEW: backend-driven today total
+      todayTotal: 0,
     };
   },
 
@@ -661,7 +655,7 @@ export default {
       "sale",
       "activeFilter",
       "transactions",
-      "confirmDeleteModal",
+      "adminConfirmModal",
     ]),
     ...mapGetters(useSalesStore, [
       "totalAmount",
@@ -684,7 +678,6 @@ export default {
       );
     },
 
-    // Keep for listing today's transactions (UI), but use todayTotal for the card
     todaysSortedTransactions() {
       const today = new Date();
       const y = today.getFullYear();
@@ -755,49 +748,70 @@ export default {
   },
 
   methods: {
-  ...mapActions(useSalesStore, [
-    "saveSale",
-    "setFilter",
-    "confirmAndMarkDone",
-    "openAddSale",
-    "closeAddSale",
-    "fetchTransactions",
-    "openEditSale",
-    "deleteTransaction",
-    "openConfirmDelete",
-    "closeConfirmDelete",
-    "confirmDeleteWithPassword",
-  ]),
+    ...mapActions(useSalesStore, [
+      "saveSale",
+      "setFilter",
+      "confirmAndMarkDone",
+      "openAddSale",
+      "closeAddSale",
+      "fetchTransactions",
+      "openEditSale",
+      "deleteTransaction",
+      "openConfirmDelete",
+      "openConfirmUpdate",
+      "closeConfirmDelete",
+      "confirmDeleteWithPassword",
+      "confirmUpdateWithPassword",
+    ]),
 
-  openEdit(tx) {
-    this.openEditSale(tx);
+    openEdit(tx) {
+      this.openEditSale(tx);
+    },
+
+    onConfirmDeleteClick() {
+      const mode = this.adminConfirmModal.mode;
+
+      if (mode === "delete") {
+        this.confirmDeleteWithPassword(this.adminPasswordInput).then(() => {
+          this.adminPasswordInput = "";
+          this.loadTodayTotal();
+        });
+      } else if (mode === "update") {
+        const updatedSale = { ...this.adminConfirmModal.targetTx };
+
+        this.confirmUpdateWithPassword(this.adminPasswordInput, updatedSale).then(
+          async () => {
+            this.adminPasswordInput = "";
+            this.closeAddSale();
+            await this.loadTodayTotal();
+          }
+        );
+      }
+    },
+
+    async loadTodayTotal() {
+      const res = await api.get("/sales/today");
+      this.todayTotal = res.data?.today_total ?? 0;
+    },
+
+    async handleSaveSale() {
+      if (this.sale.id) {
+        this.openConfirmUpdate({ ...this.sale });
+      } else {
+        await this.saveSale();
+        await this.loadTodayTotal();
+      }
+    },
+
+    async handleConfirmAndMarkDone(tx) {
+      await this.confirmAndMarkDone(tx);
+      await this.loadTodayTotal();
+    },
   },
-
-  onConfirmDeleteClick() {
-    this.confirmDeleteWithPassword(this.adminPasswordInput);
-  },
-
-  async loadTodayTotal() {
-    const res = await api.get("/sales/today");
-    this.todayTotal = res.data?.today_total ?? 0;
-  },
-
-  // NEW: wrapper that saves, then refreshes todayTotal
-  async handleSaveSale() {
-    await this.saveSale();       // calls Pinia action
-    await this.loadTodayTotal(); // refresh today card
-  },
-
-  async handleConfirmAndMarkDone(tx) {
-  await this.confirmAndMarkDone(tx); // calls Pinia action
-  await this.loadTodayTotal();       // refresh /sales/today total
-},
-},
-
 
   async mounted() {
     await this.fetchTransactions();
-    await this.loadTodayTotal(); // fetch timezone-correct “today” total
+    await this.loadTodayTotal();
   },
 };
 </script>
