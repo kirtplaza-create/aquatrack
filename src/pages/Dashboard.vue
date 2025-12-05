@@ -59,7 +59,7 @@
                 stroke="currentColor"
                 stroke-width="2"
               >
-                ircle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="10" /> 
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -355,7 +355,7 @@
                 stroke="currentColor"
                 stroke-width="2"
               >
-                ircle cx="11" cy="11" r="8" />
+                <circle cx="11" cy="11" r="8" /> 
                 <path d="M21 21l-4.3-4.3" />
               </svg>
             </span>
@@ -493,7 +493,7 @@
                     stroke="currentColor"
                     stroke-width="2"
                   >
-                    ircle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="10" />
                     <path
                       d="M12 8v4l3 3"
                       stroke-linecap="round"
@@ -514,7 +514,7 @@
                     stroke="currentColor"
                     stroke-width="2"
                   >
-                    ircle cx="12" cy="12" r="10" />
+                    <circle cx="12" cy="12" r="10" />
                     <path
                       d="M16 12l-4 4-4-4"
                       stroke-linecap="round"
