@@ -160,42 +160,56 @@
             </select>
           </div>
 
-          <!-- Gallons -->
-          <div class="mb-4">
-            <label class="block text-white mb-1">No. Gallons:</label>
-            <input
-              v-model.number="sale.gallons"
-              type="number"
-              min="1"
-              class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-              required
-            />
-          </div>
+          <!-- Gallon Types -->
+<div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+  <div>
+    <label class="block text-white mb-1">
+  Regular (₱{{ priceRegular }}) – Qty:
+</label>
 
-          <!-- Price + Total -->
-          <div class="mb-4 flex flex-col md:flex-row gap-3">
-            <div class="flex-1">
-              <label class="block text-white mb-1">Price per Gallon:</label>
-              <input
-                v-model.number="sale.price_per_gallon"
-                type="number"
-                min="1"
-                class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                required
-              />
-              <span class="text-xs text-white">Auto Fills</span>
-            </div>
-            <div class="flex-1">
-              <label class="block text-white mb-1">Total Amount:</label>
-              <input
-                :value="totalAmount"
-                type="text"
-                class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white/80"
-                readonly
-              />
-              <span class="text-xs text-white">Auto Calculates</span>
-            </div>
-          </div>
+    <input
+      v-model.number="sale.regular_qty"
+      type="number"
+      min="0"
+      class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+    />
+  </div>
+  <div>
+    <label class="block text-white mb-1">
+  Small (₱{{ priceSmall }}) – Qty:
+</label>
+
+    <input
+      v-model.number="sale.small_qty"
+      type="number"
+      min="0"
+      class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+    />
+  </div>
+</div>
+
+<!-- Totals (auto) -->
+<div class="mb-4 flex flex-col md:flex-row gap-3">
+  <div class="flex-1">
+    <label class="block text-white mb-1">Total Gallons:</label>
+    <input
+      :value="computedGallons"
+      type="text"
+      class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white/80"
+      readonly
+    />
+  </div>
+  <div class="flex-1">
+    <label class="block text-white mb-1">Total Amount:</label>
+    <input
+      :value="`₱${computedTotalAmount.toFixed(2)}`"
+      type="text"
+      class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white/80"
+      readonly
+    />
+    <span class="text-xs text-white">Auto Calculates</span>
+  </div>
+</div>
 
           <!-- Status -->
           <div class="mb-6">
@@ -448,9 +462,10 @@
                   {{ tx.created_at ? tx.created_at.slice(0, 10) : "" }}
                 </span>
                 <span class="text-gray-400 text-xs">
-                  {{ tx.created_at ? tx.created_at.slice(11, 19) : "" }}
+                  {{ formatTime(tx.created_at) }}
                 </span>
               </td>
+
 
               <!-- Gallons -->
               <td class="px-4 py-3 flex items-center gap-2">
@@ -650,13 +665,15 @@ export default {
   },
 
   computed: {
-    ...mapState(useSalesStore, [
-      "showAddSale",
-      "sale",
-      "activeFilter",
-      "transactions",
-      "adminConfirmModal",
-    ]),
+  ...mapState(useSalesStore, [
+    "showAddSale",
+    "sale",
+    "activeFilter",
+    "transactions",
+    "adminConfirmModal",
+    "priceRegular",
+    "priceSmall",
+  ]),
     ...mapGetters(useSalesStore, [
       "totalAmount",
       "filteredTransactions",
@@ -735,16 +752,35 @@ export default {
     },
 
     isSaleFormValid() {
-      const s = this.sale;
-      return (
-        s.name &&
-        s.name.trim() !== "" &&
-        (s.purpose === "Walk-in" || s.purpose === "Delivery") &&
-        s.gallons > 0 &&
-        s.price_per_gallon > 0 &&
-        (s.status === "Collectables" || s.status === "Done")
-      );
-    },
+  const s = this.sale;
+  const totalGallons = this.computedGallons;
+  const totalAmount = this.computedTotalAmount;
+
+  return (
+    s.name &&
+    s.name.trim() !== "" &&
+    (s.purpose === "Walk-in" || s.purpose === "Delivery") &&
+    totalGallons > 0 &&
+    totalAmount > 0 &&
+    (s.status === "Collectables" || s.status === "Done")
+  );
+},
+
+    computedGallons() {
+  const regular = Number(this.sale.regular_qty || 0);
+  const small = Number(this.sale.small_qty || 0);
+  return regular + small;
+},
+
+computedTotalAmount() {
+  const regular = Number(this.sale.regular_qty || 0);
+  const small   = Number(this.sale.small_qty || 0);
+
+  // use reactive store values (mapped via mapState)
+  return regular * this.priceRegular + small * this.priceSmall;
+},
+
+
   },
 
   methods: {
@@ -763,6 +799,18 @@ export default {
       "confirmDeleteWithPassword",
       "confirmUpdateWithPassword",
     ]),
+
+    formatTime(datetime) {
+    if (!datetime) return ""
+    const d = new Date(datetime)
+    let hours = d.getHours()
+    const minutes = d.getMinutes().toString().padStart(2, "0")
+    const ampm = hours >= 12 ? "PM" : "AM"
+    hours = hours % 12
+    if (hours === 0) hours = 12
+    return `${hours}:${minutes} ${ampm}`
+  },
+
 
     openEdit(tx) {
       this.openEditSale(tx);
@@ -810,9 +858,15 @@ export default {
   },
 
   async mounted() {
-    await this.fetchTransactions();
-    await this.loadTodayTotal();
-  },
+  const store = useSalesStore()
+
+  // load prices first so modal uses the saved values
+  await store.loadPrices()
+
+  await this.fetchTransactions()
+  await this.loadTodayTotal()
+}
+
 };
 </script>
 

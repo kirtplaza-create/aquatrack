@@ -1,89 +1,128 @@
 <template>
-  <div class="flex-1 min-h-screen bg-[#f7faff] py-10 px-8">
+  <div class="flex-1 min-h-screen bg-[#f7faff] py-6 px-6">
     <div class="max-w-6xl mx-auto w-full">
-      <div class="rounded-2xl bg-white shadow-lg p-10">
-        <h2 class="text-3xl font-semibold text-[#183153] mb-8">Sales Records</h2>
+      <div class="rounded-2xl bg-white shadow-lg px-8 py-6">
+        <h2 class="text-2xl font-semibold text-[#183153] mb-4">Sales Records</h2>
+
 
         <!-- Filters & search -->
-        <div class="flex items-center gap-3 mb-6">
-          <!-- Sort -->
-          <div class="flex items-center gap-1">
-            <span class="text-gray-600">Sort by</span>
-            <select
-              v-model="sortBy"
-              class="rounded-lg border px-3 py-1 focus:ring-2 focus:ring-blue-400 outline-none"
+<div class="flex flex-col gap-3 mb-6 md:flex-row md:items-center">
+  <!-- Left: Sort + Status -->
+  <div class="flex items-center gap-4 flex-wrap">
+    <!-- Sort -->
+    <div class="flex items-center gap-2">
+      <span class="text-gray-600 text-sm">Sort by</span>
+      <select
+        v-model="sortBy"
+        class="rounded-lg border px-3 py-1 text-sm focus:ring-2 focus:ring-blue-400 outline-none"
+      >
+        <option value="Recently">Recently</option>
+        <option value="Oldest">Oldest</option>
+      </select>
+    </div>
+
+    <!-- Filter by status -->
+    <div class="flex items-center gap-2">
+      <span class="text-gray-600 text-sm">Filter by</span>
+      <div class="relative" ref="dropdownRef">
+        <button
+          @click="dropdownOpen = !dropdownOpen"
+          class="rounded-lg border px-3 py-1 bg-white flex items-center gap-2 min-w-[90px] text-sm
+                 focus:ring-2 focus:ring-blue-400 outline-none transition hover:bg-blue-50"
+        >
+          <span>{{ filterStatus }}</span>
+          <svg
+            :class="{ 'rotate-180': dropdownOpen }"
+            class="h-4 w-4 transition-transform duration-200"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <transition name="fade">
+          <div
+            v-if="dropdownOpen"
+            class="absolute z-20 left-0 mt-2 w-40 rounded-xl bg-white border shadow-lg py-2 text-gray-700"
+          >
+            <div
+              v-for="status in statuses"
+              :key="status"
+              @click="selectStatus(status)"
+              class="px-5 py-2 cursor-pointer hover:bg-blue-100 transition-colors"
+              :class="{
+                'font-semibold text-blue-600 bg-blue-50': filterStatus === status
+              }"
             >
-              <option value="Recently">Recently</option>
-              <option value="Oldest">Oldest</option>
-            </select>
-          </div>
-
-          <!-- Filter by status -->
-          <div class="flex items-center gap-1">
-            <span class="text-gray-600">Filter by</span>
-            <div class="relative" ref="dropdownRef">
-              <button
-                @click="dropdownOpen = !dropdownOpen"
-                class="rounded-lg border px-3 py-1 bg-white flex items-center gap-2 min-w-[94px] focus:ring-2 focus:ring-blue-400 outline-none transition hover:bg-blue-50"
-              >
-                <span>{{ filterStatus }}</span>
-                <svg
-                  :class="{ 'rotate-180': dropdownOpen }"
-                  class="h-4 w-4 transition-transform duration-200"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <transition name="fade">
-                <div
-                  v-if="dropdownOpen"
-                  class="absolute z-20 left-0 mt-2 w-40 rounded-xl bg-white border shadow-lg py-2 text-gray-700"
-                >
-                  <div
-                    v-for="status in statuses"
-                    :key="status"
-                    @click="selectStatus(status)"
-                    class="px-5 py-2 cursor-pointer hover:bg-blue-100 transition-colors"
-                    :class="{
-                      'font-semibold text-blue-600 bg-blue-50': filterStatus === status
-                    }"
-                  >
-                    {{ status }}
-                  </div>
-                </div>
-              </transition>
+              {{ status }}
             </div>
           </div>
+        </transition>
+      </div>
+    </div>
+  </div>
 
-          <div class="flex-1"></div>
+  <!-- Middle: Date range -->
+<div class="flex items-center gap-2">
+  <span class="text-gray-600 text-sm">Date:</span>
+  <button
+    type="button"
+    class="px-4 py-1.5 rounded-lg text-sm font-semibold border"
+    :class="dateRange === 'All'
+      ? 'bg-blue-600 text-white border-blue-600'
+      : 'bg-white text-gray-700'"
+    @click="setDateRange('All')"
+  >
+    All
+  </button>
+  <button
+    type="button"
+    class="px-4 py-1.5 rounded-lg text-sm font-semibold border"
+    :class="dateRange === 'Today'
+      ? 'bg-blue-600 text-white border-blue-600'
+      : 'bg-white text-gray-700'"
+    @click="setDateRange('Today')"
+  >
+    Today
+  </button>
+  <button
+    type="button"
+    class="px-4 py-1.5 rounded-lg text-sm font-semibold border"
+    :class="dateRange === 'ThisMonth'
+      ? 'bg-blue-600 text-white border-blue-600'
+      : 'bg-white text-gray-700'"
+    @click="setDateRange('ThisMonth')"
+  >
+    This Month
+  </button>
+</div>
 
-          <!-- Search -->
-          <div>
-            <div class="relative">
-              <input
-                type="text"
-                placeholder="Customer Name / Date..."
-                class="rounded-xl border px-4 py-2 bg-[#f7faff] w-80 focus:border-blue-400 pl-10 focus:ring-2 focus:ring-blue-200 outline-none transition"
-                v-model="searchVal"
-              />
-              <span class="absolute left-3 top-2.5 text-blue-300">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <circle cx="11" cy="11" r="8" stroke-width="2" />
-                  <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2" />
-                </svg>
-              </span>
-            </div>
-          </div>
-        </div>
+  <!-- Right: Search -->
+  <div class="ml-auto">
+    <div class="relative">
+      <input
+        type="text"
+        placeholder="Customer Name / Date..."
+        class="rounded-xl border px-4 py-2 bg-[#f7faff] w-64 md:w-80 focus:border-blue-400 pl-10
+               focus:ring-2 focus:ring-blue-200 outline-none transition text-sm"
+        v-model="searchVal"
+      />
+      <span class="absolute left-3 top-2.5 text-blue-300">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <circle cx="11" cy="11" r="8" stroke-width="2" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" stroke-width="2" />
+        </svg>
+      </span>
+    </div>
+  </div>
+</div>
 
         <!-- Table -->
         <div class="rounded-xl overflow-hidden shadow mt-2">
@@ -95,6 +134,7 @@
                 <th class="py-4 px-6 font-bold">Purpose</th>
                 <th class="py-4 px-6 font-bold">Gallons</th>
                 <th class="py-4 px-6 font-bold">Amount</th>
+                <th class="py-4 px-6 font-bold">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -119,9 +159,10 @@
                 <td class="py-5 px-6">
                   {{ record.created_at ? record.created_at.slice(0, 10) : '' }} <br />
                   <span class="text-gray-400 text-xs">
-                    {{ record.created_at ? record.created_at.slice(11, 19) : '' }}
+                    {{ formatTime(record.created_at) }}
                   </span>
                 </td>
+
 
                 <!-- Purpose -->
                 <td class="py-5 px-6">
@@ -137,10 +178,63 @@
                 <td class="py-5 px-6 font-semibold">
                   ₱{{ record.total_amount }}
                 </td>
+
+                <!-- Status / Collectables -->
+<td class="py-5 px-6">
+  <button
+    v-if="record.status === 'Collectables'"
+    type="button"
+    @click.stop="handleConfirmAndMarkDone(record)"
+    class="inline-flex items-center gap-2 text-xs font-semibold text-orange-600 bg-orange-50 px-3 py-1 rounded-full
+           hover:bg-orange-100 hover:text-orange-700 transition"
+    title="Mark as Done"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-4 w-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path
+        d="M12 8v4l3 3"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+    Collectables
+  </button>
+
+  <span
+    v-else
+    class="inline-flex items-center gap-2 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      class="h-4 w-4"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <path
+        d="M16 12l-4 4-4-4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+    Done
+  </span>
+</td>
+
               </tr>
 
               <tr v-if="paginatedRecords.length === 0">
-                <td colspan="5" class="px-6 py-8 text-center text-gray-400">
+                <td colspan="6" class="px-6 py-8 text-center text-gray-400">
+
                   No records found.
                 </td>
               </tr>
@@ -204,6 +298,9 @@ const dropdownRef = ref(null)
 // sort state
 const sortBy = ref('Recently')
 
+// NEW: date range filter
+const dateRange = ref('All') // 'All' | 'Today' | 'ThisMonth'
+
 // statuses now match backend statuses
 const statuses = ['All', 'Collectables', 'Done']
 
@@ -217,10 +314,21 @@ function selectStatus(status) {
   currentPage.value = 1
 }
 
+function handleConfirmAndMarkDone(tx) {
+  salesStore.confirmAndMarkDone(tx)
+}
+
+
 function handleDropdownClick(event) {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target)) {
     dropdownOpen.value = false
   }
+}
+
+// NEW: change date range
+function setDateRange(range) {
+  dateRange.value = range
+  currentPage.value = 1
 }
 
 onMounted(() => {
@@ -235,13 +343,39 @@ onBeforeUnmount(() => {
 // all sales from store
 const records = computed(() => salesStore.transactions)
 
-// filter + search
+// filter + search + NEW date range
 const filteredRecords = computed(() => {
   let data = records.value
 
   // status filter
   if (filterStatus.value !== 'All') {
     data = data.filter(r => r.status === filterStatus.value)
+  }
+
+  // NEW: date range filter
+  if (dateRange.value !== 'All') {
+    const now = new Date()
+    const todayY = now.getFullYear()
+    const todayM = now.getMonth()
+    const todayD = now.getDate()
+
+    data = data.filter(r => {
+      if (!r.created_at) return false
+      const d = new Date(r.created_at)
+      const y = d.getFullYear()
+      const m = d.getMonth()
+      const day = d.getDate()
+
+      if (dateRange.value === 'Today') {
+        return y === todayY && m === todayM && day === todayD
+      }
+
+      if (dateRange.value === 'ThisMonth') {
+        return y === todayY && m === todayM
+      }
+
+      return true
+    })
   }
 
   // search: match name, date, purpose
@@ -302,7 +436,19 @@ const visiblePages = computed(() => {
   }
   return pages
 })
+
+function formatTime(datetime) {
+  if (!datetime) return ''
+  const d = new Date(datetime)
+  let hours = d.getHours()
+  const minutes = d.getMinutes().toString().padStart(2, '0')
+  const ampm = hours >= 12 ? 'PM' : 'AM'
+  hours = hours % 12
+  if (hours === 0) hours = 12
+  return `${hours}:${minutes} ${ampm}`
+}
 </script>
+
 
 <style scoped>
 .fade-enter-active,

@@ -9,8 +9,8 @@ export const useSalesStore = defineStore("sales", {
       id: null,
       name: "",
       purpose: "",
-      gallons: 1,
-      price_per_gallon: 15,
+      regular_qty: 0,
+      small_qty: 0,
       status: "",
     },
     activeFilter: "All",
@@ -18,21 +18,28 @@ export const useSalesStore = defineStore("sales", {
     transactions: [],
     editingId: null,
 
-    // generic admin confirmation modal (delete + update)
+    // prices (can be changed from Settings page)
+    priceRegular: 15,
+    priceSmall: 10,
+
     adminConfirmModal: {
       show: false,
-      mode: null,     // 'delete' | 'update'
-      targetTx: null, // transaction to act on
+      mode: null,
+      targetTx: null,
     },
   }),
 
+
   getters: {
-    totalAmount(state) {
-      const gallons = Number(state.sale.gallons) || 0;
-      const price = Number(state.sale.price_per_gallon) || 0;
-      const total = gallons * price;
-      return `₱${total.toFixed(2)}`;
-    },
+   totalAmount(state) {
+  const regular = Number(state.sale.regular_qty) || 0;
+  const small = Number(state.sale.small_qty) || 0;
+
+  const total = regular * state.priceRegular + small * state.priceSmall;
+  return `₱${total.toFixed(2)}`;
+},
+
+
 
     filteredTransactions(state) {
       let txs =
@@ -150,7 +157,19 @@ export const useSalesStore = defineStore("sales", {
   },
 
   actions: {
+
+     async loadPrices() {
+    try {
+      const res = await api.get("/settings/prices")
+      this.priceRegular = Number(res.data.price_regular)
+      this.priceSmall = Number(res.data.price_small)
+    } catch (error) {
+      console.error("Error loading prices:", error.response ?? error)
+      // if it fails, you keep defaults 15 / 10
+    }
+  },
     // GET /api/sales
+    
     async fetchTransactions() {
       try {
         const res = await api.get("/sales");
@@ -162,83 +181,95 @@ export const useSalesStore = defineStore("sales", {
     },
 
     openAddSale() {
-      this.editingId = null;
-      this.sale = {
-        id: null,
-        name: "",
-        purpose: "",
-        gallons: 1,
-        price_per_gallon: 15,
-        status: "",
-      };
-      this.showAddSale = true;
-    },
+  this.editingId = null;
+  this.sale = {
+    id: null,
+    name: "",
+    purpose: "",
+    regular_qty: 0,
+    small_qty: 0,
+    status: "",
+  };
+  this.showAddSale = true;
+},
 
-    openEditSale(tx) {
-      this.editingId = tx.id;
-      this.sale = { ...tx };
-      this.showAddSale = true;
-    },
+openEditSale(tx) {
+  this.editingId = tx.id;
+  this.sale = {
+    id: tx.id,
+    name: tx.name,
+    purpose: tx.purpose,
+    regular_qty: tx.regular_qty || 0,
+    small_qty: tx.small_qty || 0,
+    status: tx.status,
+  };
+  this.showAddSale = true;
+},
+
 
     closeAddSale() {
       this.showAddSale = false;
     },
 
     // CREATE (no password)
-    async saveSale() {
-      if (!this.sale.name || !this.sale.purpose || !this.sale.status) {
-        alert("Please fill out customer name, purpose, and status.");
-        return;
-      }
+async saveSale() {
+  if (!this.sale.name || !this.sale.purpose || !this.sale.status) {
+    alert("Please fill out customer name, purpose, and status.");
+    return;
+  }
 
-      const gallons = Number(this.sale.gallons) || 0;
-      const price = Number(this.sale.price_per_gallon) || 0;
-      const total = gallons * price;
+   const regular = Number(this.sale.regular_qty) || 0;
+  const small   = Number(this.sale.small_qty) || 0;
+  const gallons = regular + small;
 
-      const payload = {
-        name: this.sale.name,
-        purpose: this.sale.purpose,
-        gallons,
-        price_per_gallon: price,
-        total_amount: total,
-        status: this.sale.status,
-      };
+  const total = regular * this.priceRegular + small * this.priceSmall;
 
-      try {
-        let savedSale;
-        if (this.editingId) {
-          // we will NOT use this branch for update with password anymore
-          const res = await api.put(`/sales/${this.editingId}`, payload);
-          savedSale = res.data;
-          const idx = this.transactions.findIndex(
-            (t) => t.id === this.editingId
-          );
-          if (idx !== -1) this.transactions[idx] = savedSale;
-        } else {
-          const res = await api.post("/sales", payload);
-          savedSale = res.data;
-          this.transactions.push(savedSale);
-        }
+  const price_per_gallon = gallons > 0 ? total / gallons : 0;
 
-        alert(
-          `Sale saved for ${savedSale.name}, amount: ₱${savedSale.total_amount}`
-        );
+   const payload = {
+    name: this.sale.name,
+    purpose: this.sale.purpose,
+    gallons,
+    price_per_gallon,
+    total_amount: total,
+    status: this.sale.status,
+  };
 
-        this.showAddSale = false;
-        this.editingId = null;
-        this.sale = {
-          id: null,
-          name: "",
-          purpose: "",
-          gallons: 1,
-          price_per_gallon: 15,
-          status: "",
-        };
-      } catch (error) {
-        console.error("Error saving sale:", error.response ?? error);
-        alert("Failed to save sale to server.");
-      }
-    },
+  try {
+    let savedSale;
+    if (this.editingId) {
+      const res = await api.put(`/sales/${this.editingId}`, payload);
+      savedSale = res.data;
+      const idx = this.transactions.findIndex(
+        (t) => t.id === this.editingId
+      );
+      if (idx !== -1) this.transactions[idx] = savedSale;
+    } else {
+      const res = await api.post("/sales", payload);
+      savedSale = res.data;
+      this.transactions.push(savedSale);
+    }
+
+    alert(
+      `Sale saved for ${savedSale.name}, amount: ₱${savedSale.total_amount}`
+    );
+
+    this.showAddSale = false;
+    this.editingId = null;
+    this.sale = {
+      id: null,
+      name: "",
+      purpose: "",
+      regular_qty: 0,
+      small_qty: 0,
+      status: "",
+    };
+  } catch (error) {
+    console.error("Error saving sale:", error.response ?? error);
+    alert("Failed to save sale to server.");
+  }
+}
+,
 
     setFilter(filter) {
       this.activeFilter = filter;
@@ -354,19 +385,20 @@ export const useSalesStore = defineStore("sales", {
         // 1) verify password
         await api.post("/admin/confirm-password", { password });
 
-        // 2) build payload
-        const gallons = Number(updatedSale.gallons) || 0;
-        const price = Number(updatedSale.price_per_gallon) || 0;
-        const total = gallons * price;
+        const regular = Number(updatedSale.regular_qty) || 0;
+const small   = Number(updatedSale.small_qty) || 0;
+const gallons = regular + small;
 
-        const payload = {
-          name: updatedSale.name,
-          purpose: updatedSale.purpose,
-          gallons,
-          price_per_gallon: price,
-          total_amount: total,
-          status: updatedSale.status,
-        };
+const total = regular * this.priceRegular + small * this.priceSmall;
+
+const payload = {
+  name: updatedSale.name,
+  purpose: updatedSale.purpose,
+  gallons,
+  total_amount: total,
+  status: updatedSale.status,
+};
+
 
         // 3) PUT /sales/{id}
         const res = await api.put(`/sales/${updatedSale.id}`, payload);

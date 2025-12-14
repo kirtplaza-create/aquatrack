@@ -135,78 +135,81 @@
         </div>
       </div>
 
-      <!-- Right side stacked cards -->
-      <div class="flex flex-col gap-4">
-        <!-- Selected Period -->
+    <!-- Right side stacked cards -->
+<div class="flex flex-col gap-4">
+  <!-- Selected Period -->
+  <div
+    class="bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] text-white rounded-3xl p-6 shadow-lg relative overflow-hidden"
+  >
+    <div class="absolute inset-0 bg-white/10 pointer-events-none"></div>
+    <div class="flex items-center justify-between mb-3 relative z-10">
+      <div class="flex items-center gap-3 text-sm">
         <div
-          class="bg-gradient-to-r from-[#2563eb] to-[#1d4ed8] text-white rounded-3xl p-6 shadow-lg relative overflow-hidden"
+          class="h-11 w-11 rounded-2xl bg-white/15 flex items-center justify-center shadow-sm text-base"
         >
-          <div class="absolute inset-0 bg-white/10 pointer-events-none"></div>
-          <div class="flex items-center justify-between mb-2 relative z-10">
-            <div class="flex items-center gap-3 text-xs">
-              <div
-                class="h-10 w-10 rounded-2xl bg-white/15 flex items-center justify-center shadow-sm"
-              >
-                ₱
-              </div>
-              <div>
-                <div class="uppercase tracking-wide opacity-90 text-[11px]">
-                  Selected Period
-                </div>
-                <div class="text-[11px] opacity-75">
-                  {{ revenue.from }} – {{ revenue.to }}
-                </div>
-              </div>
-            </div>
-            <div class="text-[11px] opacity-80 bg-white/10 px-3 py-1 rounded-full">
-              {{ formatDateRange(revenue.from, revenue.to) }}
-            </div>
-          </div>
-          <div class="mt-3 text-4xl lg:text-5xl font-semibold relative z-10">
-            ₱{{ formatMoney(totalMonthlyRevenue) }}
-          </div>
+          ₱
         </div>
-
-        <!-- Average Revenue (stacked below) -->
-        <div class="bg-white rounded-3xl shadow-md p-5 border border-gray-100">
-          <div class="flex items-center gap-3 mb-3">
-            <div
-              class="h-9 w-9 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm"
-            >
-              ₱
-            </div>
-            <div>
-              <div class="text-xs uppercase text-gray-500">
-                Average Revenue
-              </div>
-              <div class="text-[11px] text-gray-400">Per period</div>
-            </div>
+        <div>
+          <div class="uppercase tracking-wide opacity-90 text-xs lg:text-sm font-semibold">
+            Selected Period
           </div>
-          <div class="text-2xl font-semibold text-gray-900">
-            ₱{{ formatMoney(averageDailyRevenue) }}
-          </div>
-        </div>
-
-        <!-- Total Revenue (stacked last) -->
-        <div class="bg-white rounded-3xl shadow-md p-5 border border-gray-100">
-          <div class="flex items-center gap-3 mb-3">
-            <div
-              class="h-9 w-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm"
-            >
-              📊
-            </div>
-            <div>
-              <div class="text-xs uppercase text-gray-500">
-                Total Revenue
-              </div>
-              <div class="text-[11px] text-gray-400">All periods</div>
-            </div>
-          </div>
-          <div class="text-2xl font-semibold text-gray-900">
-            ₱{{ formatMoney(totalMonthlyRevenue) }}
+          <div class="text-xs lg:text-sm opacity-85">
+            {{ revenue.from }} – {{ revenue.to }}
           </div>
         </div>
       </div>
+      <div
+        class="text-xs lg:text-sm opacity-90 bg-white/15 px-4 py-1.5 rounded-full font-medium"
+      >
+        {{ formatDateRange(revenue.from, revenue.to) }}
+      </div>
+    </div>
+    <div class="mt-4 text-4xl lg:text-5xl font-bold tracking-tight relative z-10">
+      ₱{{ formatMoney(totalMonthlyRevenue) }}
+    </div>
+  </div>
+
+  <!-- Average Revenue (stacked below) -->
+  <div class="bg-white rounded-3xl shadow-md p-5 border border-gray-100">
+    <div class="flex items-center gap-3 mb-3">
+      <div
+        class="h-10 w-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-base"
+      >
+        ₱
+      </div>
+      <div>
+        <div class="text-sm lg:text-base font-semibold uppercase text-gray-600">
+          Average Revenue
+        </div>
+        <div class="text-xs lg:text-sm text-gray-400">Per period</div>
+      </div>
+    </div>
+    <div class="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">
+      ₱{{ formatMoney(averageDailyRevenue) }}
+    </div>
+  </div>
+
+  <!-- Total Revenue (stacked last) -->
+  <div class="bg-white rounded-3xl shadow-md p-5 border border-gray-100">
+    <div class="flex items-center gap-3 mb-3">
+      <div
+        class="h-10 w-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base"
+      >
+        📊
+      </div>
+      <div>
+        <div class="text-sm lg:text-base font-semibold uppercase text-gray-600">
+          Total Revenue
+        </div>
+        <div class="text-xs lg:text-sm text-gray-400">All periods</div>
+      </div>
+    </div>
+    <div class="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">
+      ₱{{ formatMoney(totalMonthlyRevenue) }}
+    </div>
+  </div>
+</div>
+
     </div>
 
     <!-- Revenue Overview (BAR graph) -->

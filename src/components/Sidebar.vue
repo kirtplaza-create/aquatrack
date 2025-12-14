@@ -1,8 +1,8 @@
 <template>
   <aside
-    class="fixed left-0 top-0 w-60 h-screen bg-[#101929] text-white flex flex-col py-6 z-20"
+    class="fixed left-0 top-0 w-60 h-screen bg-[#101929] text-white flex flex-col justify-between py-6 z-20"
   >
-    <!-- Top logo section -->
+    <!-- Top logo section + main nav -->
     <div>
       <div class="flex items-center gap-3 px-6 mb-8">
         <div
@@ -106,7 +106,7 @@
     </div>
 
     <!-- Bottom section -->
-    <div class="flex flex-col gap-1 mt-8">
+    <div class="flex flex-col gap-1">
       <router-link
         to="/account"
         class="flex items-center gap-2 px-6 py-2 rounded-xl text-white font-medium"
@@ -177,4 +177,3 @@ function logout() {
   router.push('/logout');
 }
 </script>
-  
