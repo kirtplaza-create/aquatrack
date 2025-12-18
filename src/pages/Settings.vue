@@ -134,7 +134,7 @@
 
       <div class="mb-4 text-left">
         <label class="block text-sm font-medium text-gray-700 mb-1">
-          Type <span class="font-mono font-semibold">RESET SYSTEM</span> to confirm
+          Type (<span class="font-mono font-semibold">YES, RESET THE SYSTEM</span>) to confirm
         </label>
         <input
           v-model="resetPhrase"
@@ -228,7 +228,7 @@ function cancel() {
 const showReset = ref(false)
 const resetPassword = ref('')
 const resetPhrase = ref('')
-const REQUIRED_PHRASE = 'RESET SYSTEM'
+const REQUIRED_PHRASE = 'YES, RESET THE SYSTEM'
 
 const isResetValid = computed(
   () =>
@@ -257,7 +257,6 @@ async function reset() {
   }
 }
 </script>
-
 
 
 <style scoped>

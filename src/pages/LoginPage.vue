@@ -37,7 +37,7 @@
           <input
             v-model="name"
             type="text"
-            placeholder="Name"
+            placeholder="Username"
             class="block w-full rounded-full px-6 py-3 font-medium bg-white/10 text-white placeholder-gray-300 focus:ring-2 ring-[#3586ff] outline-none transition"
             required
           />
@@ -100,7 +100,7 @@
               v-model="rememberMe"
               class="rounded border-gray-300 focus:ring-blue-500 focus:ring-2 w-4 h-4 mr-2 accent-blue-500"
             />
-            Remember Me
+            Remember username
           </label>
           <button
             type="button"
@@ -128,7 +128,7 @@
 
 <script setup>
 import aquatracklogo from "../assets/aquatracklogo.png";
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/useAuthStore";
 
@@ -141,10 +141,26 @@ const error = ref("");
 const auth = useAuthStore();
 const router = useRouter();
 
+// Load saved username on page load
+onMounted(() => {
+  const savedName = localStorage.getItem("aquatrack_username");
+  if (savedName) {
+    name.value = savedName;
+    rememberMe.value = true;
+  }
+});
+
 async function submit() {
   error.value = "";
   try {
     await auth.login(name.value, password.value);
+
+    if (rememberMe.value) {
+      localStorage.setItem("aquatrack_username", name.value);
+    } else {
+      localStorage.removeItem("aquatrack_username");
+    }
+
     router.push("/dashboard");
   } catch (e) {
     error.value = "Invalid name or password";
