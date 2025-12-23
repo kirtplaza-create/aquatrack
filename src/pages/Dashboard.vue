@@ -28,8 +28,8 @@
       >
         <div class="flex items-center gap-6 w-full justify-between">
           <div>
-            <div class="rounded-xl bg-violet-100 p-3 inline-block mb-2">
-              <span class="text-2xl text-violet-600">₱</span>
+            <div class="rounded-xl bg-blue-100 p-3 inline-block mb-2">
+              <span class="text-2xl text-blue-600">₱</span>
             </div>
             <div class="font-semibold text-slate-600">Total Revenue</div>
             <div class="text-2xl font-bold text-slate-900 mt-1">
@@ -37,7 +37,7 @@
             </div>
           </div>
           <span
-            class="bg-violet-600 text-white px-4 py-1 rounded-full text-sm font-medium"
+            class="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium"
           >
             Today
           </span>
@@ -50,16 +50,16 @@
       >
         <div class="flex items-center gap-6 w-full justify-between">
           <div>
-            <div class="rounded-xl bg-orange-100 p-3 inline-block mb-2">
+            <div class="rounded-xl bg-blue-100 p-3 inline-block mb-2">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6 text-orange-500"
+                class="h-6 w-6 text-blue-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 stroke-width="2"
               >
-                <circle cx="12" cy="12" r="10" /> 
+                <circle cx="12" cy="12" r="10" />
                 <path
                   stroke-linecap="round"
                   stroke-linejoin="round"
@@ -73,7 +73,7 @@
             </div>
           </div>
           <span
-            class="bg-orange-500 text-white px-4 py-1 rounded-full text-sm font-medium"
+            class="bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-medium"
           >
             Today
           </span>
@@ -99,7 +99,7 @@
               stroke-width="2"
             >
               <path
-                d="M6 20h12M10 6l4 4-4 4"
+                d="M12 5v14M5 12h14"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               />
@@ -161,55 +161,53 @@
           </div>
 
           <!-- Gallon Types -->
-<div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
-  <div>
-    <label class="block text-white mb-1">
-  Regular (₱{{ priceRegular }}) – Qty:
-</label>
+          <div class="mb-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-white mb-1">
+                Regular (₱{{ priceRegular }}) – Qty:
+              </label>
+              <input
+                v-model.number="sale.regular_qty"
+                type="number"
+                min="0"
+                class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              />
+            </div>
+            <div>
+              <label class="block text-white mb-1">
+                Small (₱{{ priceSmall }}) – Qty:
+              </label>
+              <input
+                v-model.number="sale.small_qty"
+                type="number"
+                min="0"
+                class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+              />
+            </div>
+          </div>
 
-    <input
-      v-model.number="sale.regular_qty"
-      type="number"
-      min="0"
-      class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-    />
-  </div>
-  <div>
-    <label class="block text-white mb-1">
-  Small (₱{{ priceSmall }}) – Qty:
-</label>
-
-    <input
-      v-model.number="sale.small_qty"
-      type="number"
-      min="0"
-      class="w-full px-3 py-2 rounded-xl border border-gray-200 transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-    />
-  </div>
-</div>
-
-<!-- Totals (auto) -->
-<div class="mb-4 flex flex-col md:flex-row gap-3">
-  <div class="flex-1">
-    <label class="block text-white mb-1">Total Gallons:</label>
-    <input
-      :value="computedGallons"
-      type="text"
-      class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white/80"
-      readonly
-    />
-  </div>
-  <div class="flex-1">
-    <label class="block text-white mb-1">Total Amount:</label>
-    <input
-      :value="`₱${computedTotalAmount.toFixed(2)}`"
-      type="text"
-      class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white/80"
-      readonly
-    />
-    <span class="text-xs text-white">Auto Calculates</span>
-  </div>
-</div>
+          <!-- Totals (auto) -->
+          <div class="mb-4 flex flex-col md:flex-row gap-3">
+            <div class="flex-1">
+              <label class="block text-white mb-1">Total Gallons:</label>
+              <input
+                :value="computedGallons"
+                type="text"
+                class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white/80"
+                readonly
+              />
+            </div>
+            <div class="flex-1">
+              <label class="block text-white mb-1">Total Amount:</label>
+              <input
+                :value="`₱${computedTotalAmount.toFixed(2)}`"
+                type="text"
+                class="w-full px-3 py-2 rounded-xl border border-gray-200 bg-white/80"
+                readonly
+              />
+              <span class="text-xs text-white">Auto Calculates</span>
+            </div>
+          </div>
 
           <!-- Status -->
           <div class="mb-6">
@@ -260,33 +258,39 @@
           Overview of your sales performance
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="rounded-xl bg-green-50 p-5 flex flex-col">
-            <span class="text-green-500 text-2xl mb-2">₱</span>
+          <div class="rounded-xl bg-blue-50 p-5 flex flex-col">
+            <span class="text-blue-500 text-2xl mb-2">₱</span>
             <span class="font-semibold text-slate-500">Gross Revenue</span>
             <span class="font-bold text-xl text-slate-900 mt-1">
               ₱{{ totalEarnings }}
             </span>
           </div>
           <div class="rounded-xl bg-blue-50 p-5 flex flex-col">
-            <span class="text-blue-500 text-2xl mb-2">👜</span>
+            <span class="text-blue-500 text-xs font-semibold mb-1 uppercase">
+              Volume
+            </span>
             <span class="font-semibold text-slate-500">Total Gallons Sold</span>
             <span class="font-bold text-xl text-slate-900 mt-1">
               {{ totalGallonsSold }} <span class="text-xs">gallons</span>
             </span>
           </div>
-          <div class="rounded-xl bg-purple-50 p-5 flex flex-col">
-            <span class="text-purple-500 text-2xl mb-2">₱</span>
+          <div class="rounded-xl bg-blue-50 p-5 flex flex-col">
+            <span class="text-blue-500 text-xs font-semibold mb-1 uppercase">
+              Average
+            </span>
             <span class="font-semibold text-slate-500">Avg Sales per Day</span>
             <span class="font-bold text-xl text-slate-900 mt-1">
               ₱{{ avgSalesPerDay }}
             </span>
           </div>
-          <div class="rounded-xl bg-orange-50 p-5 flex flex-col">
-            <span class="text-orange-500 text-2xl mb-2">🧾</span>
+          <div class="rounded-xl bg-blue-50 p-5 flex flex-col">
+            <span class="text-blue-500 text-xs font-semibold mb-1 uppercase">
+              Transactions
+            </span>
             <span class="font-semibold text-slate-500">Total Transactions</span>
             <span class="font-bold text-xl text-slate-900 mt-1">
               {{ totalTransactions }}
-              <span class="text-xs text-green-600">completed</span>
+              <span class="text-xs text-blue-600">completed</span>
             </span>
           </div>
         </div>
@@ -303,8 +307,10 @@
           Breakdown of refill types and volumes
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="rounded-xl bg-sky-50 p-5 flex flex-col">
-            <span class="text-sky-500 text-2xl mb-2">📦</span>
+          <div class="rounded-xl bg-blue-50 p-5 flex flex-col">
+            <span class="text-blue-500 text-xs font-semibold mb-1 uppercase">
+              Refills
+            </span>
             <span class="font-semibold text-slate-500">
               Total Refills Completed
             </span>
@@ -312,22 +318,28 @@
               {{ totalRefillsCompleted }}
             </span>
           </div>
-          <div class="rounded-xl bg-green-50 p-5 flex flex-col">
-            <span class="text-green-500 text-2xl mb-2">🚶</span>
+          <div class="rounded-xl bg-blue-50 p-5 flex flex-col">
+            <span class="text-blue-500 text-xs font-semibold mb-1 uppercase">
+              Walk-in
+            </span>
             <span class="font-semibold text-slate-500">Walk-in Refills</span>
             <span class="font-bold text-xl text-slate-900 mt-1">
               {{ walkInRefills }}
             </span>
           </div>
-          <div class="rounded-xl bg-purple-50 p-5 flex flex-col">
-            <span class="text-purple-500 text-2xl mb-2">🚚</span>
+          <div class="rounded-xl bg-blue-50 p-5 flex flex-col">
+            <span class="text-blue-500 text-xs font-semibold mb-1 uppercase">
+              Delivery
+            </span>
             <span class="font-semibold text-slate-500">Delivery Refills</span>
             <span class="font-bold text-xl text-slate-900 mt-1">
               {{ deliveryRefills }}
             </span>
           </div>
           <div class="rounded-xl bg-blue-50 p-5 flex flex-col">
-            <span class="text-blue-500 text-2xl mb-2">💧</span>
+            <span class="text-blue-500 text-xs font-semibold mb-1 uppercase">
+              Total Gallons
+            </span>
             <span class="font-semibold text-slate-500">
               Total Gallons Dispensed
             </span>
@@ -369,7 +381,7 @@
                 stroke="currentColor"
                 stroke-width="2"
               >
-                <circle cx="11" cy="11" r="8" /> 
+                <circle cx="11" cy="11" r="8" />
                 <path d="M21 21l-4.3-4.3" />
               </svg>
             </span>
@@ -403,8 +415,8 @@
             :class="[
               'rounded-xl px-6 py-2 text-sm font-semibold shadow transition',
               activeFilter === 'Collectables'
-                ? 'bg-orange-500 text-white'
-                : 'bg-white text-orange-600 hover:bg-orange-100'
+                ? 'bg-blue-100 text-blue-700'
+                : 'bg-white text-blue-700 hover:bg-blue-50'
             ]"
             @click="setFilter('Collectables')"
           >
@@ -448,8 +460,8 @@
                   :class="[
                     'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold',
                     tx.purpose === 'Walk-in'
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-blue-100 text-blue-700'
+                      ? 'bg-blue-50 text-blue-700'
+                      : 'bg-blue-100 text-blue-800'
                   ]"
                 >
                   {{ tx.purpose }}
@@ -459,13 +471,12 @@
               <!-- Date & Time -->
               <td class="px-4 py-3">
                 <span class="block">
-                  {{ tx.created_at ? tx.created_at.slice(0, 10) : "" }}
+                  {{ tx.created_at ? tx.created_at.slice(0, 10) : '' }}
                 </span>
                 <span class="text-gray-400 text-xs">
                   {{ formatTime(tx.created_at) }}
                 </span>
               </td>
-
 
               <!-- Gallons -->
               <td class="px-4 py-3 flex items-center gap-2">
@@ -497,7 +508,7 @@
                   v-if="tx.status === 'Collectables'"
                   type="button"
                   @click="handleConfirmAndMarkDone(tx)"
-                  class="inline-flex items-center gap-2 text-xs font-semibold text-orange-600 bg-orange-50 px-3 py-1 rounded-full hover:bg-orange-100 hover:text-orange-700 transition"
+                  class="inline-flex items-center gap-2 text-xs font-semibold text-blue-700 bg-blue-50 px-3 py-1 rounded-full hover:bg-blue-100 transition"
                   title="Mark as Done"
                 >
                   <svg
@@ -519,7 +530,7 @@
                 </button>
                 <span
                   v-else
-                  class="inline-flex items-center gap-2 text-xs font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full"
+                  class="inline-flex items-center gap-2 text-xs font-semibold text-blue-800 bg-blue-50 px-3 py-1 rounded-full"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -614,18 +625,22 @@
         class="relative z-50 bg-white rounded-2xl p-6 w-full max-w-sm shadow-lg animate-fadeIn"
       >
         <h3 class="text-lg font-semibold text-gray-800 mb-2">
-          {{ adminConfirmModal.mode === 'update' ? 'Confirm Update' : 'Confirm Delete' }}
+          {{ adminConfirmModal.mode === 'update'
+            ? 'Confirm Update'
+            : 'Confirm Delete' }}
         </h3>
         <p class="text-sm text-gray-600 mb-4">
           Enter the admin password to
-          {{ adminConfirmModal.mode === 'update' ? 'update this transaction.' : 'delete this transaction.' }}
+          {{ adminConfirmModal.mode === 'update'
+            ? 'update this transaction.'
+            : 'delete this transaction.' }}
         </p>
 
         <input
           v-model="adminPasswordInput"
           type="password"
           placeholder="Admin password"
-          class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-300"
+          class="w-full mb-4 px-3 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300"
         />
 
         <div class="flex justify-end gap-3">
@@ -638,7 +653,7 @@
           </button>
           <button
             type="button"
-            class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-red-600 hover:bg-red-700"
+            class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700"
             @click="onConfirmDeleteClick"
           >
             Confirm
@@ -646,8 +661,81 @@
         </div>
       </div>
     </div>
+    <!-- Receipt modal -->
+<div
+  v-if="showReceipt && lastSavedSale"
+  class="fixed inset-0 z-40 flex items-center justify-center"
+>
+  <div class="fixed inset-0 bg-black/40 backdrop-blur-lg"></div>
+
+  <div
+    class="relative bg-white rounded-2xl p-6 w-full max-w-sm shadow-lg animate-fadeIn"
+  >
+    <h3 class="text-lg font-semibold text-gray-800 mb-2">
+      Sales Receipt
+    </h3>
+    <p class="text-sm text-gray-500 mb-4">
+      Summary for the recently added sale.
+    </p>
+
+    <div class="space-y-2 text-sm text-gray-700">
+      <div class="flex justify-between">
+        <span class="font-medium">Customer</span>
+        <span>{{ lastSavedSale.name || 'Walk-in Customer' }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium">Purpose</span>
+        <span>{{ lastSavedSale.purpose }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium">Regular Qty</span>
+        <span>{{ lastSavedSale.regular_qty || 0 }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium">Small Qty</span>
+        <span>{{ lastSavedSale.small_qty || 0 }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium">Total Gallons</span>
+        <span>{{ lastSavedSale.gallons || computedGallons }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium">Total Amount</span>
+        <span class="font-semibold">₱{{ lastSavedSale.total_amount || computedTotalAmount.toFixed(2) }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium">Status</span>
+        <span>{{ lastSavedSale.status }}</span>
+      </div>
+      <div class="flex justify-between">
+        <span class="font-medium">Date</span>
+        <span>{{ (lastSavedSale.created_at || new Date().toISOString()).slice(0,10) }}</span>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-end gap-3">
+      <button
+        type="button"
+        class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200"
+        @click="showReceipt = false"
+      >
+        Close
+      </button>
+      <!-- Optional: hook this to window.print() or a dedicated print function -->
+      <button
+        type="button"
+        class="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700"
+        @click="printReceipt"
+      >
+        Print
+      </button>
+    </div>
+  </div>
+</div>
+
   </div>
 </template>
+
 
 <script>
 import api from "../api/axios";
@@ -661,6 +749,8 @@ export default {
       adminPasswordInput: "",
       txToEdit: null,
       todayTotal: 0,
+      showReceipt: false,
+      lastSavedSale: null,
     };
   },
 
@@ -799,6 +889,7 @@ computedTotalAmount() {
       "confirmDeleteWithPassword",
       "confirmUpdateWithPassword",
     ]),
+    
 
     formatTime(datetime) {
     if (!datetime) return ""
@@ -843,13 +934,33 @@ computedTotalAmount() {
     },
 
     async handleSaveSale() {
-      if (this.sale.id) {
-        this.openConfirmUpdate({ ...this.sale });
-      } else {
-        await this.saveSale();
-        await this.loadTodayTotal();
-      }
+  if (this.sale.id) {
+    this.openConfirmUpdate({ ...this.sale });
+  } else {
+    // take a snapshot of the values you want to show on the receipt
+    const snapshot = {
+      name: this.sale.name || "Walk-in Customer",
+      purpose: this.sale.purpose,
+      regular_qty: this.sale.regular_qty || 0,
+      small_qty: this.sale.small_qty || 0,
+      gallons: this.computedGallons,
+      total_amount: this.computedTotalAmount,
+      status: this.sale.status,
+      created_at: new Date().toISOString(),
+    };
+
+    await this.saveSale();
+    await this.loadTodayTotal();
+
+    this.lastSavedSale = snapshot;
+    this.showReceipt = true;
+    this.closeAddSale();
+  }
+},
+    printReceipt() {
+      window.print();
     },
+
 
     async handleConfirmAndMarkDone(tx) {
       await this.confirmAndMarkDone(tx);
