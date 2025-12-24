@@ -1,9 +1,9 @@
 <template>
   <aside
-    class="fixed left-0 top-0 w-60 h-screen bg-[#101929] text-white flex flex-col justify-between py-6 z-20"
+    class="fixed left-0 top-0 w-60 h-screen bg-[#101929] text-white flex flex-col py-6 z-20"
   >
     <!-- Top logo section + main nav -->
-    <div>
+    <div class="flex flex-col">
       <div class="flex items-center gap-3 px-6 mb-8">
         <div
           class="flex flex-col items-center justify-center bg-[#246af3] rounded-full h-14 w-14 shadow-lg"
@@ -105,8 +105,8 @@
       </nav>
     </div>
 
-    <!-- Bottom section -->
-    <div class="flex flex-col gap-1">
+    <!-- Bottom section closer to top -->
+    <div class="mt-4 mb-6 flex flex-col gap-1">
       <router-link
         to="/account"
         class="flex items-center gap-2 px-6 py-2 rounded-xl text-white font-medium"
@@ -167,10 +167,8 @@
 
 <script setup>
 import aquatracklogo from '../assets/aquatracklogo.png';
-import { useUserStore } from '../stores/user';
 import { useRouter } from 'vue-router';
 
-const userStore = useUserStore();
 const router = useRouter();
 
 function logout() {
